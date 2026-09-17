@@ -30,18 +30,18 @@ set_location_assignment PIN_U48 -to fpga_sgpo
 
 #=================================================================================
 
-set_instance_assignment -name IO_STANDARD "TRUE DIFFERENTIAL SIGNALING" -to clk_100_mhz -entity AGX_FM87_Devkit_HSB_NVQLINK_100GbE
-set_instance_assignment -name INPUT_TERMINATION DIFFERENTIAL -to clk_100_mhz -entity AGX_FM87_Devkit_HSB_NVQLINK_100GbE
+set_instance_assignment -name IO_STANDARD "TRUE DIFFERENTIAL SIGNALING" -to clk_100_mhz -entity AGX_7i_Devkit_HSB_NVQLINK_100GbE
+set_instance_assignment -name INPUT_TERMINATION DIFFERENTIAL -to clk_100_mhz -entity AGX_7i_Devkit_HSB_NVQLINK_100GbE
 
-set_instance_assignment -name IO_STANDARD "1.2 V" -to rst_pb_n -entity AGX_FM87_Devkit_HSB_NVQLINK_100GbE
+set_instance_assignment -name IO_STANDARD "1.2 V" -to rst_pb_n -entity AGX_7i_Devkit_HSB_NVQLINK_100GbE
 
-set_instance_assignment -name IO_STANDARD "1.2 V" -to user_pb_n[0] -entity AGX_FM87_Devkit_HSB_NVQLINK_100GbE
-set_instance_assignment -name IO_STANDARD "1.2 V" -to user_pb_n[1] -entity AGX_FM87_Devkit_HSB_NVQLINK_100GbE
+set_instance_assignment -name IO_STANDARD "1.2 V" -to user_pb_n[0] -entity AGX_7i_Devkit_HSB_NVQLINK_100GbE
+set_instance_assignment -name IO_STANDARD "1.2 V" -to user_pb_n[1] -entity AGX_7i_Devkit_HSB_NVQLINK_100GbE
 
-set_instance_assignment -name IO_STANDARD "1.2 V" -to fpga_sgpio_sync -entity AGX_FM87_Devkit_HSB_NVQLINK_100GbE
-set_instance_assignment -name IO_STANDARD "1.2 V" -to fpga_sgpio_clk -entity AGX_FM87_Devkit_HSB_NVQLINK_100GbE
-set_instance_assignment -name IO_STANDARD "1.2 V" -to fpga_sgpi -entity AGX_FM87_Devkit_HSB_NVQLINK_100GbE
-set_instance_assignment -name IO_STANDARD "1.2 V" -to fpga_sgpo -entity AGX_FM87_Devkit_HSB_NVQLINK_100GbE
+set_instance_assignment -name IO_STANDARD "1.2 V" -to fpga_sgpio_sync -entity AGX_7i_Devkit_HSB_NVQLINK_100GbE
+set_instance_assignment -name IO_STANDARD "1.2 V" -to fpga_sgpio_clk -entity AGX_7i_Devkit_HSB_NVQLINK_100GbE
+set_instance_assignment -name IO_STANDARD "1.2 V" -to fpga_sgpi -entity AGX_7i_Devkit_HSB_NVQLINK_100GbE
+set_instance_assignment -name IO_STANDARD "1.2 V" -to fpga_sgpo -entity AGX_7i_Devkit_HSB_NVQLINK_100GbE
 
 
 set_global_assignment -name VERILOG_FILE ../non_qpds_ip/shell/sgpio_slave.v

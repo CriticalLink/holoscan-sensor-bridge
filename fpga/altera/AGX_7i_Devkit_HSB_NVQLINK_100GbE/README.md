@@ -100,7 +100,7 @@ holoscan-sensor-bridge
 └── fpga
     ├── nv_hsb_ip
     └── altera
-        └── AGX_FM87_Devkit_HSB_NVQLINK_100GbE
+        └── AGX_7i_Devkit_HSB_NVQLINK_100GbE
 ```
 
 For detailed information about the NVIDIA HSB IP please refer to the
@@ -173,8 +173,8 @@ structure:
 
 ```
 quartus
-├── AGX_FM87_Devkit_HSB_NVQLINK_100GbE.qpf                          # Quartus project file
-├── AGX_FM87_Devkit_HSB_NVQLINK_100GbE.qsf                          # Main project QSF, calls all sub-QSFs
+├── AGX_7i_Devkit_HSB_NVQLINK_100GbE.qpf                          # Quartus project file
+├── AGX_7i_Devkit_HSB_NVQLINK_100GbE.qsf                          # Main project QSF, calls all sub-QSFs
 ├── shell
 │   ├── top_supplemental.qsf         # Additional project settings (output dir, top-level RTL)
 │   ├── board_subsystem.qsf          # Board subsystem IO and source assignments
@@ -194,8 +194,8 @@ file if desired.
 ### Design Hierarchy
 
 ```
-AGX_FM87_Devkit_HSB_NVQLINK_100GbE.v  (Project top-level Verilog)
-└── AGX_FM87_Devkit_HSB_NVQLINK_100GbE_qsys.qsys  (Top-level Platform Designer system)
+AGX_7i_Devkit_HSB_NVQLINK_100GbE.v  (Project top-level Verilog)
+└── AGX_7i_Devkit_HSB_NVQLINK_100GbE_qsys.qsys  (Top-level Platform Designer system)
     ├── board_subsystem.qsys      (shell)
     ├── clock_subsystem.qsys      (shell)
     ├── ftile_eth_subsystem.qsys  (user)
@@ -343,7 +343,7 @@ inside `hsb_subsystem` and converted to Avalon-MM; the remaining three are expor
 
 ### Resource Utilisation
 
-Figures below are from a Quartus® Prime Pro 26.1 compilation of this design (`AGX_FM87_Devkit_HSB_NVQLINK_100GbE.fit.rpt`,
+Figures below are from a Quartus® Prime Pro 26.1 compilation of this design (`AGX_7i_Devkit_HSB_NVQLINK_100GbE.fit.rpt`,
 2026-08-24). ALMs are **ALMs needed**; registers are **Dedicated Logic Registers**.
 
 | Subsystem | ALMs | Registers | RAM Blocks (M20K) | DSPs |
@@ -362,7 +362,7 @@ setup slack 0.149 ns; 0 failing endpoints).
 ### Building the Design
 
 The example design can be built using a script or via the Quartus® Prime Pro GUI. The built FPGA
-bitstream `AGX_FM87_Devkit_HSB_NVQLINK_100GbE.sof` is located in the `quartus/output_files` directory.
+bitstream `AGX_7i_Devkit_HSB_NVQLINK_100GbE.sof` is located in the `quartus/output_files` directory.
 
 #### Script Build
 
@@ -380,7 +380,7 @@ quartus_sh -t build_shell.tcl -qsys_gen -hw_compile
 
 #### Quartus® GUI Build
 
-1. Open `quartus/AGX_FM87_Devkit_HSB_NVQLINK_100GbE.qpf` in Quartus® Prime Pro Edition 26.1.
+1. Open `quartus/AGX_7i_Devkit_HSB_NVQLINK_100GbE.qpf` in Quartus® Prime Pro Edition 26.1.
 2. On the Compilation Dashboard select **"Compile Design"**.
 
 
@@ -439,7 +439,7 @@ quartus_sh -t build_shell.tcl -qsys_gen -hw_compile
 ### Pre-Built Binaries
 
 Pre-built `SOF` and `JIC` binaries can be found as assets in this repository under the release tag:
-https://github.com/altera-fpga/holoscan-sensor-bridge/releases/tag/altera-release-2.6.0-4
+https://github.com/altera-fpga/holoscan-sensor-bridge/releases/tag/altera-release-2.6.0-5
 
 | Product | Type | Description |
 |:-----:|:-----:|:-----:|
@@ -455,7 +455,7 @@ https://github.com/altera-fpga/holoscan-sensor-bridge/releases/tag/altera-releas
   - Either use your own or download a pre-built `SOF` image, then program the FPGA:
 
     ```bash
-    quartus_pgm -c 1 -m jtag -o "p;AGX_FM87_Devkit_HSB_NVQLINK_100GbE.sof"
+    quartus_pgm -c 1 -m jtag -o "p;AGX_7i_Devkit_HSB_NVQLINK_100GbE.sof"
     ```
 
   - Or, use the Quartus® Programmer GUI:
@@ -478,7 +478,7 @@ https://github.com/altera-fpga/holoscan-sensor-bridge/releases/tag/altera-releas
     </p>
     <br/>
 
-    - Select your `AGX_FM87_Devkit_HSB_NVQLINK_100GbE.sof` file. Check the **"Program/Configure"** box and press the **"Start"**
+    - Select your `AGX_7i_Devkit_HSB_NVQLINK_100GbE.sof` file. Check the **"Program/Configure"** box and press the **"Start"**
       button (see below). Wait until the programming has been completed.
 
   <p align="center">

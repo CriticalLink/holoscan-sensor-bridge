@@ -12,7 +12,7 @@
 // ##################################################################################
 
 
-module AGX_FM87_Devkit_HSB_NVQLINK_100GbE
+module AGX_7i_Devkit_HSB_NVQLINK_100GbE
    (
 
       clk_100_mhz,
@@ -127,7 +127,7 @@ module AGX_FM87_Devkit_HSB_NVQLINK_100GbE
   );
 
 
-  AGX_FM87_Devkit_HSB_NVQLINK_100GbE_qsys u0 (
+  AGX_7i_Devkit_HSB_NVQLINK_100GbE_qsys u0 (
     .board_subsystem_i_clk_clk            (clk_100_mhz),
     .board_subsystem_ia_reset_pb_n_reset  (rst_pb_n),
 

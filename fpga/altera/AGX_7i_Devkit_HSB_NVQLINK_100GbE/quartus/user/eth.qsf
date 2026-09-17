@@ -21,14 +21,14 @@
 set_location_assignment PIN_CP23 -to qsfp_lowpwr
 set_location_assignment PIN_CM23 -to qsfp_rstn
 
-set_instance_assignment -name MESSAGE_DISABLE 13410 -to qsfp_lowpwr -entity AGX_FM87_Devkit_HSB_NVQLINK_100GbE
-set_instance_assignment -name MESSAGE_DISABLE 13410 -to qsfp_rstn   -entity AGX_FM87_Devkit_HSB_NVQLINK_100GbE
+set_instance_assignment -name MESSAGE_DISABLE 13410 -to qsfp_lowpwr -entity AGX_7i_Devkit_HSB_NVQLINK_100GbE
+set_instance_assignment -name MESSAGE_DISABLE 13410 -to qsfp_rstn   -entity AGX_7i_Devkit_HSB_NVQLINK_100GbE
 
-set_instance_assignment -name IO_STANDARD   "1.2 V" -to qsfp_lowpwr -entity AGX_FM87_Devkit_HSB_NVQLINK_100GbE
-set_instance_assignment -name IO_STANDARD   "1.2 V" -to qsfp_rstn   -entity AGX_FM87_Devkit_HSB_NVQLINK_100GbE
+set_instance_assignment -name IO_STANDARD   "1.2 V" -to qsfp_lowpwr -entity AGX_7i_Devkit_HSB_NVQLINK_100GbE
+set_instance_assignment -name IO_STANDARD   "1.2 V" -to qsfp_rstn   -entity AGX_7i_Devkit_HSB_NVQLINK_100GbE
 
-set_instance_assignment -name SLEW_RATE     1       -to qsfp_lowpwr -entity AGX_FM87_Devkit_HSB_NVQLINK_100GbE
-set_instance_assignment -name SLEW_RATE     1       -to qsfp_rstn   -entity AGX_FM87_Devkit_HSB_NVQLINK_100GbE
+set_instance_assignment -name SLEW_RATE     1       -to qsfp_lowpwr -entity AGX_7i_Devkit_HSB_NVQLINK_100GbE
+set_instance_assignment -name SLEW_RATE     1       -to qsfp_rstn   -entity AGX_7i_Devkit_HSB_NVQLINK_100GbE
 
 
 # # Transceivers (4 lanes) - 100G-4 / FGT
@@ -56,13 +56,13 @@ set_location_assignment PIN_N2   -to serial_i_rx_serial_n[3]
 
 set_location_assignment PIN_R14  -to refclk_eth_fgt
 
-# set_instance_assignment -name IO_STANDARD "CURRENT MODE LOGIC (CML)"    -to refclk_eth                -entity AGX_FM87_Devkit_HSB_NVQLINK_100GbE
-# set_instance_assignment -name IO_STANDARD "HIGH SPEED DIFFERENTIAL I/O" -to serial_i_rx_serial_data   -entity AGX_FM87_Devkit_HSB_NVQLINK_100GbE
-# set_instance_assignment -name IO_STANDARD "HIGH SPEED DIFFERENTIAL I/O" -to serial_i_rx_serial_data_n -entity AGX_FM87_Devkit_HSB_NVQLINK_100GbE
-# set_instance_assignment -name IO_STANDARD "HIGH SPEED DIFFERENTIAL I/O" -to serial_o_tx_serial_data   -entity AGX_FM87_Devkit_HSB_NVQLINK_100GbE
-# set_instance_assignment -name IO_STANDARD "HIGH SPEED DIFFERENTIAL I/O" -to serial_o_tx_serial_data_n -entity AGX_FM87_Devkit_HSB_NVQLINK_100GbE
+# set_instance_assignment -name IO_STANDARD "CURRENT MODE LOGIC (CML)"    -to refclk_eth                -entity AGX_7i_Devkit_HSB_NVQLINK_100GbE
+# set_instance_assignment -name IO_STANDARD "HIGH SPEED DIFFERENTIAL I/O" -to serial_i_rx_serial_data   -entity AGX_7i_Devkit_HSB_NVQLINK_100GbE
+# set_instance_assignment -name IO_STANDARD "HIGH SPEED DIFFERENTIAL I/O" -to serial_i_rx_serial_data_n -entity AGX_7i_Devkit_HSB_NVQLINK_100GbE
+# set_instance_assignment -name IO_STANDARD "HIGH SPEED DIFFERENTIAL I/O" -to serial_o_tx_serial_data   -entity AGX_7i_Devkit_HSB_NVQLINK_100GbE
+# set_instance_assignment -name IO_STANDARD "HIGH SPEED DIFFERENTIAL I/O" -to serial_o_tx_serial_data_n -entity AGX_7i_Devkit_HSB_NVQLINK_100GbE
 
 
-set_instance_assignment -name IO_STANDARD "HIGH SPEED DIFFERENTIAL I/O" -to serial_o_tx_serial -entity AGX_FM87_Devkit_HSB_NVQLINK_100GbE
-set_instance_assignment -name IO_STANDARD "HIGH SPEED DIFFERENTIAL I/O" -to serial_i_rx_serial -entity AGX_FM87_Devkit_HSB_NVQLINK_100GbE
+set_instance_assignment -name IO_STANDARD "HIGH SPEED DIFFERENTIAL I/O" -to serial_o_tx_serial -entity AGX_7i_Devkit_HSB_NVQLINK_100GbE
+set_instance_assignment -name IO_STANDARD "HIGH SPEED DIFFERENTIAL I/O" -to serial_i_rx_serial -entity AGX_7i_Devkit_HSB_NVQLINK_100GbE
 
