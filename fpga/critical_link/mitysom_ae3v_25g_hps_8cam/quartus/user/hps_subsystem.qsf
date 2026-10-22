@@ -1,0 +1,7 @@
+set_global_assignment -name IP_FILE ../rtl/user/ip/hps_subsys/hps_subsys_intel_agilex_5_soc_0.ip
+set_global_assignment -name IP_FILE ../rtl/user/ip/hps_subsys/hps_emif_0.ip
+set_global_assignment -name IP_FILE ../rtl/user/ip/hps_subsys/hps_subsys_lwhps2fpga_clock_bridge_0.ip
+set_global_assignment -name IP_FILE ../rtl/user/ip/hps_subsys/hps_subsys_lwhps2fpga_reset_bridge_0.ip
+set_global_assignment -name IP_FILE ../rtl/user/ip/hps_subsys/hps_subsys_lwhps2fpga_mm_bridge_0.ip
+set_global_assignment -name IP_FILE ../rtl/user/ip/hps_subsys/hps_subsys_usbc_int_pio.ip
+set_global_assignment -name QSYS_FILE ../rtl/user/hps_subsys.qsys

@@ -1,0 +1,14 @@
+quartus/dni/
+quartus/qdb/
+quartus/tmp-clearbox/
+quartus/output_files/*
+quartus/platform_designer_log.txt
+quartus/sm_hssi_port_rotation_param_map.json
+# PD generated files are be bundled into folders
+rtl/.qsys_edit/
+rtl/*_qsys/
+rtl/*/*_subsystem/
+rtl/*/ip/*_subsystem/*/
+# hps_subsys keeps upstream's -subsys (not -subsystem) name; ignore its generated dirs too
+rtl/*/hps_subsys/
+rtl/*/ip/hps_subsys/*/
