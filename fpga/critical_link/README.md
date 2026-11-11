@@ -55,16 +55,29 @@ switch (U43). All cameras answer at I2C address 0x1A.
 Requirements:
 
 - Quartus Prime Pro 26.1 with Agilex 5 device support
-- The free licenses for the MIPI D-PHY IP and the MIPI CSI-2 IP, installed before
-  synthesis
+- The free Altera licenses for the MIPI D-PHY IP and the MIPI CSI-2 IP, installed before
+  synthesis. Without them the assembler writes only a time-limited SOF and the build
+  stops with an error.
+- For the HPS-first designs, the HPS U-Boot SPL `u-boot-spl.ihex`, attached to each
+  [GitHub release](https://github.com/criticallink/holoscan-sensor-bridge/releases). The
+  same SPL serves both SOMs.
 
-From a design's directory:
+`build.tcl`, in this directory, builds any of the designs: it generates the Platform
+Designer systems, compiles the design and writes its flash images into the design's
+`quartus/output_files/`. `<design>` is a design name from the table above or the path of
+a design directory. From the repository root:
 
 ```bash
-quartus_sh -t scripts/build_shell.tcl -hw_compile
+# FPGA-first: <design>.sof and <design>.jic
+quartus_sh -t fpga/critical_link/build.tcl <design>
+# HPS-first: <design>.sof, <design>.hps.jic and <design>.core.rbf
+quartus_sh -t fpga/critical_link/build.tcl <design> -spl u-boot-spl.ihex
 ```
 
-The SOF is written to `quartus/output_files/<design>.sof`.
+`-images_only` writes the images from the SOF already in `quartus/output_files/` without
+compiling. The script stops at the first step that fails. Each build regenerates the IP,
+so the HSB IP datecode and the placement change from build to build; the script warns if
+the design's timing summary shows a miss or is absent. The build has been run on Linux.
 
 Both MIPI D-PHY IPs set `RX_CLK_SETTLE` to 16 on every link instead of the IP's
 automatic value. It sets the clock-lane settle time in D-PHY core clock cycles (12.8 ns
@@ -89,8 +102,9 @@ Load a SOF over JTAG (lost at power off):
 quartus_pgm -c 1 -m jtag -o "p;<design>.sof@2"
 ```
 
-Or write the image to the SOM's QSPI flash. Create the JIC from the SOF, using the
-design's FPGA as the flash loader:
+Or write the image to the SOM's QSPI flash. The release has the JIC, and `build.tcl`
+writes it for your own builds; by hand, create it from the SOF with the design's FPGA as
+the flash loader:
 
 ```bash
 quartus_pfg -c -o device=MT25QU256 -o mode=ASX4 -o flash_loader=<fpga> <design>.sof <design>.jic
@@ -104,7 +118,8 @@ then power cycle the board.
 An HPS-first design needs two images from the same build: the JIC in the SOM's QSPI (SDM
 firmware, the HPS first-stage bootloader and the I/O configuration) and the core RBF on
 the SD card (the FPGA fabric). Both come from one `quartus_pfg` run, which also needs
-the U-Boot SPL (`u-boot-spl.ihex`) from the MitySOM-A5E software for the SOM:
+the U-Boot SPL `u-boot-spl.ihex` attached to the release. `build.tcl -spl` runs it for
+your own builds; by hand:
 
 ```bash
 quartus_pfg -c -o hps_path=u-boot-spl.ihex -o hps=on -o device=MT25QU256 -o mode=ASX4 \

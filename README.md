@@ -63,7 +63,11 @@ Prebuilt images for each design are attached to this repository's
   image, plus `<design>.sof` for loading the fabric over JTAG
 
 [`fpga/critical_link/README.md`](fpga/critical_link/README.md) has the programming
-steps, how to build the designs and the details of each one.
+steps and the details of each design.
+
+To build a design yourself, with Quartus Prime Pro 26.1 and the free MIPI IP licenses,
+run `fpga/critical_link/build.tcl`, which writes the SOF and the flash images; see the
+[Build](fpga/critical_link/README.md#build) section.
 
 ## Set up the Jetson AGX Thor
 
