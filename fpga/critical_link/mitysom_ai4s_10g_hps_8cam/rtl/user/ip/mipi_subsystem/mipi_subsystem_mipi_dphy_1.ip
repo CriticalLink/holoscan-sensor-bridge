@@ -6767,7 +6767,7 @@ Altera and sold by Altera or its authorized distributors.-->
         <ipxact:parameter parameterId="GUI_VCO_FREQ_MHZ_0" type="real">
           <ipxact:name>GUI_VCO_FREQ_MHZ_0</ipxact:name>
           <ipxact:displayName>VCO Clock Frequency</ipxact:displayName>
-          <ipxact:value>625.0</ipxact:value>
+          <ipxact:value>890.625</ipxact:value>
         </ipxact:parameter>
         <ipxact:parameter parameterId="GUI_CORE_CLK_DIV_1" type="int">
           <ipxact:name>GUI_CORE_CLK_DIV_1</ipxact:name>
@@ -6802,7 +6802,7 @@ Altera and sold by Altera or its authorized distributors.-->
         <ipxact:parameter parameterId="GUI_SKEW_CAL_EN_0" type="bit">
           <ipxact:name>GUI_SKEW_CAL_EN_0</ipxact:name>
           <ipxact:displayName>Skew calibration enable</ipxact:displayName>
-          <ipxact:value>false</ipxact:value>
+          <ipxact:value>true</ipxact:value>
         </ipxact:parameter>
         <ipxact:parameter parameterId="GUI_SOURCE_PLL_0" type="int">
           <ipxact:name>GUI_SOURCE_PLL_0</ipxact:name>
@@ -6967,7 +6967,7 @@ Altera and sold by Altera or its authorized distributors.-->
         <ipxact:parameter parameterId="GUI_RX_CLK_SETTLE_0" type="int">
           <ipxact:name>GUI_RX_CLK_SETTLE_0</ipxact:name>
           <ipxact:displayName>RX_CLK_SETTLE</ipxact:displayName>
-          <ipxact:value>16</ipxact:value>
+          <ipxact:value>20</ipxact:value>
         </ipxact:parameter>
         <ipxact:parameter parameterId="GUI_RX_HS_SETTLE_0_AUTO_BOOL" type="bit">
           <ipxact:name>GUI_RX_HS_SETTLE_0_AUTO_BOOL</ipxact:name>
@@ -7202,7 +7202,7 @@ Altera and sold by Altera or its authorized distributors.-->
         <ipxact:parameter parameterId="GUI_SKEW_CAL_EN_1" type="bit">
           <ipxact:name>GUI_SKEW_CAL_EN_1</ipxact:name>
           <ipxact:displayName>Skew calibration enable</ipxact:displayName>
-          <ipxact:value>false</ipxact:value>
+          <ipxact:value>true</ipxact:value>
         </ipxact:parameter>
         <ipxact:parameter parameterId="GUI_SOURCE_PLL_1" type="int">
           <ipxact:name>GUI_SOURCE_PLL_1</ipxact:name>
@@ -7367,7 +7367,7 @@ Altera and sold by Altera or its authorized distributors.-->
         <ipxact:parameter parameterId="GUI_RX_CLK_SETTLE_1" type="int">
           <ipxact:name>GUI_RX_CLK_SETTLE_1</ipxact:name>
           <ipxact:displayName>RX_CLK_SETTLE</ipxact:displayName>
-          <ipxact:value>16</ipxact:value>
+          <ipxact:value>20</ipxact:value>
         </ipxact:parameter>
         <ipxact:parameter parameterId="GUI_RX_HS_SETTLE_1_AUTO_BOOL" type="bit">
           <ipxact:name>GUI_RX_HS_SETTLE_1_AUTO_BOOL</ipxact:name>
@@ -7602,7 +7602,7 @@ Altera and sold by Altera or its authorized distributors.-->
         <ipxact:parameter parameterId="GUI_SKEW_CAL_EN_2" type="bit">
           <ipxact:name>GUI_SKEW_CAL_EN_2</ipxact:name>
           <ipxact:displayName>Skew calibration enable</ipxact:displayName>
-          <ipxact:value>false</ipxact:value>
+          <ipxact:value>true</ipxact:value>
         </ipxact:parameter>
         <ipxact:parameter parameterId="GUI_SOURCE_PLL_2" type="int">
           <ipxact:name>GUI_SOURCE_PLL_2</ipxact:name>
@@ -7767,7 +7767,7 @@ Altera and sold by Altera or its authorized distributors.-->
         <ipxact:parameter parameterId="GUI_RX_CLK_SETTLE_2" type="int">
           <ipxact:name>GUI_RX_CLK_SETTLE_2</ipxact:name>
           <ipxact:displayName>RX_CLK_SETTLE</ipxact:displayName>
-          <ipxact:value>16</ipxact:value>
+          <ipxact:value>20</ipxact:value>
         </ipxact:parameter>
         <ipxact:parameter parameterId="GUI_RX_HS_SETTLE_2_AUTO_BOOL" type="bit">
           <ipxact:name>GUI_RX_HS_SETTLE_2_AUTO_BOOL</ipxact:name>
@@ -8002,7 +8002,7 @@ Altera and sold by Altera or its authorized distributors.-->
         <ipxact:parameter parameterId="GUI_SKEW_CAL_EN_3" type="bit">
           <ipxact:name>GUI_SKEW_CAL_EN_3</ipxact:name>
           <ipxact:displayName>Skew calibration enable</ipxact:displayName>
-          <ipxact:value>false</ipxact:value>
+          <ipxact:value>true</ipxact:value>
         </ipxact:parameter>
         <ipxact:parameter parameterId="GUI_SOURCE_PLL_3" type="int">
           <ipxact:name>GUI_SOURCE_PLL_3</ipxact:name>
@@ -8167,7 +8167,7 @@ Altera and sold by Altera or its authorized distributors.-->
         <ipxact:parameter parameterId="GUI_RX_CLK_SETTLE_3" type="int">
           <ipxact:name>GUI_RX_CLK_SETTLE_3</ipxact:name>
           <ipxact:displayName>RX_CLK_SETTLE</ipxact:displayName>
-          <ipxact:value>16</ipxact:value>
+          <ipxact:value>20</ipxact:value>
         </ipxact:parameter>
         <ipxact:parameter parameterId="GUI_RX_HS_SETTLE_3_AUTO_BOOL" type="bit">
           <ipxact:name>GUI_RX_HS_SETTLE_3_AUTO_BOOL</ipxact:name>
@@ -8402,7 +8402,7 @@ Altera and sold by Altera or its authorized distributors.-->
         <ipxact:parameter parameterId="GUI_SKEW_CAL_EN_4" type="bit">
           <ipxact:name>GUI_SKEW_CAL_EN_4</ipxact:name>
           <ipxact:displayName>Skew calibration enable</ipxact:displayName>
-          <ipxact:value>false</ipxact:value>
+          <ipxact:value>true</ipxact:value>
         </ipxact:parameter>
         <ipxact:parameter parameterId="GUI_SOURCE_PLL_4" type="int">
           <ipxact:name>GUI_SOURCE_PLL_4</ipxact:name>
@@ -8567,7 +8567,7 @@ Altera and sold by Altera or its authorized distributors.-->
         <ipxact:parameter parameterId="GUI_RX_CLK_SETTLE_4" type="int">
           <ipxact:name>GUI_RX_CLK_SETTLE_4</ipxact:name>
           <ipxact:displayName>RX_CLK_SETTLE</ipxact:displayName>
-          <ipxact:value>16</ipxact:value>
+          <ipxact:value>20</ipxact:value>
         </ipxact:parameter>
         <ipxact:parameter parameterId="GUI_RX_HS_SETTLE_4_AUTO_BOOL" type="bit">
           <ipxact:name>GUI_RX_HS_SETTLE_4_AUTO_BOOL</ipxact:name>
@@ -8802,7 +8802,7 @@ Altera and sold by Altera or its authorized distributors.-->
         <ipxact:parameter parameterId="GUI_SKEW_CAL_EN_5" type="bit">
           <ipxact:name>GUI_SKEW_CAL_EN_5</ipxact:name>
           <ipxact:displayName>Skew calibration enable</ipxact:displayName>
-          <ipxact:value>false</ipxact:value>
+          <ipxact:value>true</ipxact:value>
         </ipxact:parameter>
         <ipxact:parameter parameterId="GUI_SOURCE_PLL_5" type="int">
           <ipxact:name>GUI_SOURCE_PLL_5</ipxact:name>
@@ -8967,7 +8967,7 @@ Altera and sold by Altera or its authorized distributors.-->
         <ipxact:parameter parameterId="GUI_RX_CLK_SETTLE_5" type="int">
           <ipxact:name>GUI_RX_CLK_SETTLE_5</ipxact:name>
           <ipxact:displayName>RX_CLK_SETTLE</ipxact:displayName>
-          <ipxact:value>16</ipxact:value>
+          <ipxact:value>20</ipxact:value>
         </ipxact:parameter>
         <ipxact:parameter parameterId="GUI_RX_HS_SETTLE_5_AUTO_BOOL" type="bit">
           <ipxact:name>GUI_RX_HS_SETTLE_5_AUTO_BOOL</ipxact:name>
@@ -9202,7 +9202,7 @@ Altera and sold by Altera or its authorized distributors.-->
         <ipxact:parameter parameterId="GUI_SKEW_CAL_EN_6" type="bit">
           <ipxact:name>GUI_SKEW_CAL_EN_6</ipxact:name>
           <ipxact:displayName>Skew calibration enable</ipxact:displayName>
-          <ipxact:value>false</ipxact:value>
+          <ipxact:value>true</ipxact:value>
         </ipxact:parameter>
         <ipxact:parameter parameterId="GUI_SOURCE_PLL_6" type="int">
           <ipxact:name>GUI_SOURCE_PLL_6</ipxact:name>
@@ -9367,7 +9367,7 @@ Altera and sold by Altera or its authorized distributors.-->
         <ipxact:parameter parameterId="GUI_RX_CLK_SETTLE_6" type="int">
           <ipxact:name>GUI_RX_CLK_SETTLE_6</ipxact:name>
           <ipxact:displayName>RX_CLK_SETTLE</ipxact:displayName>
-          <ipxact:value>16</ipxact:value>
+          <ipxact:value>20</ipxact:value>
         </ipxact:parameter>
         <ipxact:parameter parameterId="GUI_RX_HS_SETTLE_6_AUTO_BOOL" type="bit">
           <ipxact:name>GUI_RX_HS_SETTLE_6_AUTO_BOOL</ipxact:name>
@@ -9602,7 +9602,7 @@ Altera and sold by Altera or its authorized distributors.-->
         <ipxact:parameter parameterId="GUI_SKEW_CAL_EN_7" type="bit">
           <ipxact:name>GUI_SKEW_CAL_EN_7</ipxact:name>
           <ipxact:displayName>Skew calibration enable</ipxact:displayName>
-          <ipxact:value>false</ipxact:value>
+          <ipxact:value>true</ipxact:value>
         </ipxact:parameter>
         <ipxact:parameter parameterId="GUI_SOURCE_PLL_7" type="int">
           <ipxact:name>GUI_SOURCE_PLL_7</ipxact:name>
@@ -9767,7 +9767,7 @@ Altera and sold by Altera or its authorized distributors.-->
         <ipxact:parameter parameterId="GUI_RX_CLK_SETTLE_7" type="int">
           <ipxact:name>GUI_RX_CLK_SETTLE_7</ipxact:name>
           <ipxact:displayName>RX_CLK_SETTLE</ipxact:displayName>
-          <ipxact:value>16</ipxact:value>
+          <ipxact:value>20</ipxact:value>
         </ipxact:parameter>
         <ipxact:parameter parameterId="GUI_RX_HS_SETTLE_7_AUTO_BOOL" type="bit">
           <ipxact:name>GUI_RX_HS_SETTLE_7_AUTO_BOOL</ipxact:name>

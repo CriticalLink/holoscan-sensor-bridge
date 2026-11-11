@@ -79,12 +79,14 @@ compiling. The script stops at the first step that fails. Each build regenerates
 so the HSB IP datecode and the placement change from build to build; the script warns if
 the design's timing summary shows a miss or is absent. The build has been run on Linux.
 
-Both MIPI D-PHY IPs set `RX_CLK_SETTLE` to 16 on every link instead of the IP's
-automatic value. It sets the clock-lane settle time in D-PHY core clock cycles (12.8 ns
-at 78.125 MHz), and 16 is the largest value the IP's own range allows under the D-PHY
-specification's 300 ns TCLK-SETTLE maximum. At the automatic value (8) a camera link can
-come up dead at stream start, with the sensor streaming and nothing captured, until the
-camera is restarted.
+Both MIPI D-PHY IPs enable initial skew calibration on every link, which the IP
+recommends above 1500 Mbps; the IMX678 sends the calibration sequence at stream start.
+With skew calibration the receive rate is twice the PLL VCO, so the VCO is 890.625 MHz
+(1781.25 Mbps, the nearest to the sensor's 1782) and the D-PHY core clock, VCO/8, is
+111.33 MHz. `RX_CLK_SETTLE` is set to 20 on every link instead of the IP's automatic
+value. It sets the clock-lane settle time in core clock cycles: 20 gives about 251 ns,
+inside the D-PHY specification's 95 to 300 ns TCLK-SETTLE window with margin from both
+ends (the IP's maximum, 25, gives about 296 ns).
 
 ## Program the SOM
 
