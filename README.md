@@ -117,8 +117,15 @@ logo in the centre of the 3x3 grid. Useful options:
 | `--frame-rate 30\|60`          | camera frame rate                                                           |
 | `--bit-depth 10\|12`           | camera bit depth                                                            |
 | `--fullscreen`                 | fill the monitor; pass `--window-width`/`--window-height` as its resolution |
-| `--gain N`                     | analog gain, 0-240                                                          |
+| `--gain N`                     | analog gain, 0-240 (default 0)                                              |
+| `--grid-columns N`             | tiles per row (default near-square: 3 for 7-9 tiles)                        |
+| `--tiles 0,-,1,-,logo,-,2,-,3` | cells in reading order: a camera, `logo` or `-` (blank)                     |
 | `--model pose --engine <file>` | YOLO11 body pose on every camera                                            |
+
+A camera that does not answer at start-up (a loose ribbon, no power) is left out and its
+tile shows NO CAMERA; a camera that stops sending frames shows NO SIGNAL. The player
+exits if no camera answers. A `--tiles` list must fill whole rows of `--grid-columns`
+cells (pad with `-`); write a list that starts with `-` as `--tiles=-,0,...`.
 
 ### Body pose
 

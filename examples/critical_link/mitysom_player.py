@@ -19,8 +19,11 @@
 # Holoviz window. With 8 cameras the grid is 3x3 and the centre cell shows the
 # Critical Link logo card.
 #
+# --tiles places each camera, the logo and blank cells in the grid explicitly.
+#
 # A batching operator takes the latest frame from each camera, so a camera whose link
-# goes dead shows a "NO SIGNAL" tile instead of stalling the window. --model pose runs
+# goes dead shows a "NO SIGNAL" tile instead of stalling the window. A camera that does
+# not answer at start-up is left out and its tile shows "NO CAMERA". --model pose runs
 # YOLO11 body pose on every camera through one batched TensorRT engine.
 # The engine is built on the Jetson from the Ultralytics ONNX export at a 384x640
 # input, with a batch size of at least the number of cameras:
@@ -117,6 +120,30 @@ def parse_camera_list(text):
         if not 0 <= camera < len(CAMERA_CONNECTORS):
             raise argparse.ArgumentTypeError(f"unknown camera index: {camera}")
     return cameras
+
+
+def parse_tiles(text):
+    """Grid cells in reading order: a camera index, "logo" or "-" (blank)."""
+    tiles = []
+    for item in text.split(","):
+        if item == "logo" or item == "-":
+            tiles.append(item)
+            continue
+        try:
+            camera = int(item)
+        except ValueError:
+            raise argparse.ArgumentTypeError(f"invalid tile: {item!r}")
+        if not 0 <= camera < len(CAMERA_CONNECTORS):
+            raise argparse.ArgumentTypeError(f"unknown camera index: {camera}")
+        tiles.append(camera)
+    cameras = [t for t in tiles if isinstance(t, int)]
+    if not cameras:
+        raise argparse.ArgumentTypeError("no camera in the tile list")
+    if len(cameras) != len(set(cameras)):
+        raise argparse.ArgumentTypeError(f"duplicate camera in tile list: {text!r}")
+    if tiles.count("logo") > 1:
+        raise argparse.ArgumentTypeError(f"more than one logo in tile list: {text!r}")
+    return tiles
 
 
 def as_dict(message, names):
@@ -252,13 +279,14 @@ class BatchOp(holoscan.core.Operator):
 
 class TileOverlayOp(holoscan.core.Operator):
     """Emits the camera frames and the logo to Holoviz, with a NO SIGNAL label over
-    each camera that has stopped delivering frames, and the matching input specs.
-    Camera frame rates go to the log."""
+    each camera that has stopped delivering frames, a NO CAMERA label in each of
+    `missing_views`, and the matching input specs. Camera frame rates go to the log."""
 
-    def __init__(self, fragment, *args, cam_names, views, logo_view, batch_op,
-                 **kwargs):  # fmt: skip
+    def __init__(self, fragment, *args, cam_names, views, missing_views, logo_view,
+                 batch_op, **kwargs):  # fmt: skip
         self._cam_names = cam_names
         self._views = views
+        self._missing_views = missing_views
         self._logo_view = logo_view
         self._batch_op = batch_op
         self._ticks = 0
@@ -283,7 +311,7 @@ class TileOverlayOp(holoscan.core.Operator):
 
     def _tiles(self, frames):
         """Returns (tensors, specs, live) for the camera frames, the logo and the
-        NO SIGNAL labels."""
+        NO SIGNAL and NO CAMERA labels."""
         HV = holoscan.operators.HolovizOp
         live = np.asarray(frames["live"])
         out = {}
@@ -306,6 +334,10 @@ class TileOverlayOp(holoscan.core.Operator):
                 out[f"nosig{i}"] = cp.asarray([[0.36, 0.45, 0.10]], cp.float32)
                 specs.append(self._spec(f"nosig{i}", HV.InputType.TEXT, self._views[i],
                                         [1.0, 0.3, 0.3, 1.0], text=["NO SIGNAL"]))  # fmt: skip
+        for i, view in enumerate(self._missing_views):
+            out[f"nocam{i}"] = cp.asarray([[0.36, 0.45, 0.10]], cp.float32)
+            specs.append(self._spec(f"nocam{i}", HV.InputType.TEXT, view,
+                                    [1.0, 0.3, 0.3, 1.0], text=["NO CAMERA"]))  # fmt: skip
         return out, specs, live
 
     def _stats(self, elapsed, cam_fps):
@@ -319,7 +351,11 @@ class TileOverlayOp(holoscan.core.Operator):
         elapsed = time.monotonic() - self._stats_start
         if elapsed >= STATS_PERIOD_S:
             fresh = self._batch_op.take_fresh_counts()
-            cam_fps = " ".join(f"{n / elapsed:.0f}" for n in fresh)
+            # Each rate carries its camera index, from the stream name "cam<index>-<J>"
+            cam_fps = " ".join(
+                f"{name[3:name.index('-')]}:{n / elapsed:.0f}"
+                for name, n in zip(self._cam_names, fresh)
+            )
             logging.info(self._stats(elapsed, cam_fps))
             self._ticks = 0
             self._busy_s = 0.0
@@ -456,13 +492,14 @@ class PoseOverlayOp(TileOverlayOp):
 
 class PlayerApplication(holoscan.core.Application):
     def __init__(self, args, cuda_context, cuda_device_ordinal, camera_streams,
-                 window_width, window_height, logo_path):  # fmt: skip
+                 missing_cams, window_width, window_height, logo_path):  # fmt: skip
         logging.info("__init__")
         super().__init__()
         self._args = args
         self._cuda_context = cuda_context
         self._cuda_device_ordinal = cuda_device_ordinal
         self._camera_streams = camera_streams
+        self._missing_cams = missing_cams
         self._window_width = window_width
         self._window_height = window_height
         self._logo_path = logo_path
@@ -472,9 +509,9 @@ class PlayerApplication(holoscan.core.Application):
 
     def _layout(self):
         """Returns the Holoviz view of each camera tile and of the logo tile (or None)."""
-        grid_columns, grid_rows = grid_shape(
-            len(self._camera_streams), self._args.grid_columns
-        )
+        tiles = self._args.tiles
+        tile_count = len(tiles) if tiles else len(self._camera_streams)
+        grid_columns, grid_rows = grid_shape(tile_count, self._args.grid_columns)
         # Keep every tile 16:9 and centre the grid, so a window shaped differently from
         # the grid letterboxes instead of stretching.
         tile_width = min(
@@ -502,6 +539,19 @@ class PlayerApplication(holoscan.core.Application):
                 edges_y[row + 1] - edges_y[row] + (row < grid_rows - 1)
             ) / self._window_height
             return view
+
+        if tiles:
+            # Cameras and the logo take the cells --tiles names; blank cells stay black
+            camera_views = [
+                tile_view(tiles.index(stream.cam_idx))
+                for stream in self._camera_streams.values()
+            ]
+            logo_view = (
+                tile_view(tiles.index("logo"))
+                if self._logo_path and "logo" in tiles
+                else None
+            )
+            return camera_views, logo_view
 
         # With one cell to spare in an odd-by-odd grid (8 cameras in 3x3) the logo takes
         # the centre cell and the cameras fill the rest in reading order; otherwise the
@@ -605,8 +655,15 @@ class PlayerApplication(holoscan.core.Application):
     def compose(self):
         logging.info("compose")
         args = self._args
-        camera_views, logo_view = self._layout()
-        streams = list(self._camera_streams.values())
+        views, logo_view = self._layout()
+        # A camera left out at start-up keeps its tile but gets no pipeline
+        streams, camera_views, missing_views = [], [], []
+        for stream, view in zip(self._camera_streams.values(), views):
+            if stream.cam_idx in self._missing_cams:
+                missing_views.append(view)
+            else:
+                streams.append(stream)
+                camera_views.append(view)
         cam_names = [stream.name for stream in streams]
         pose = args.model == "pose"
         batch_op = BatchOp(
@@ -626,6 +683,7 @@ class PlayerApplication(holoscan.core.Application):
             name="overlay",
             cam_names=cam_names,
             views=camera_views,
+            missing_views=missing_views,
             logo_view=logo_view,
             batch_op=batch_op,
         )
@@ -676,10 +734,19 @@ def main():
     parser.add_argument(
         "--cams",
         type=parse_camera_list,
-        default=list(range(len(CAMERA_CONNECTORS))),
+        default=None,
         help="comma-separated list of cameras to stream:"
         + ", ".join(f" {i}={c}" for i, c in enumerate(CAMERA_CONNECTORS))
-        + " (default all eight)",
+        + " (default all eight, or the cameras in --tiles)",
+    )
+    parser.add_argument(
+        "--tiles",
+        type=parse_tiles,
+        default=None,
+        help="grid cells in reading order, each a camera index, logo or - (blank),"
+        " with --grid-columns cells per row, e.g. --grid-columns 3"
+        " --tiles 0,-,1,-,logo,-,2,-,3 (a list that starts with - needs"
+        " --tiles=-,...)",
     )
     parser.add_argument(
         "--resolution",
@@ -704,8 +771,8 @@ def main():
     parser.add_argument(
         "--gain",
         type=int,
-        default=32,
-        help="analog gain, 0 to 240 (default 32)",
+        default=0,
+        help="analog gain, 0 to 240 (default 0)",
     )
     parser.add_argument(
         "--model",
@@ -757,13 +824,14 @@ def main():
         "--grid-columns",
         type=int,
         default=None,
-        help="tiles per row (default near-square: 3x3 for 7-9 cameras)",
+        help="tiles per row (default near-square: 3 for 7-9 tiles)",
     )
     parser.add_argument(
         "--logo",
         default=None,
-        help="image shown in a spare grid cell (default the Critical Link logo card"
-        " when the centre cell of an odd-by-odd grid is the only spare one)",
+        help="image shown in a spare grid cell, or in the logo cell of --tiles (default"
+        " the Critical Link logo card when the centre cell of an odd-by-odd grid is the"
+        " only spare one, or when --tiles has a logo cell)",
     )
     parser.add_argument("--no-logo", action="store_true", help="show no logo")
     parser.add_argument(
@@ -782,6 +850,24 @@ def main():
     hololink_module.logging_level(args.log_level)
     logging.info("Initializing.")
 
+    if args.grid_columns is not None and args.grid_columns < 1:
+        parser.error("--grid-columns must be at least 1")
+    if args.tiles:
+        if args.logo and not args.no_logo and "logo" not in args.tiles:
+            parser.error("--logo needs a logo cell in --tiles")
+        tile_cams = [t for t in args.tiles if isinstance(t, int)]
+        if args.cams is not None and sorted(args.cams) != sorted(tile_cams):
+            parser.error("--cams and --tiles name different cameras")
+        args.cams = tile_cams
+        columns = args.grid_columns or grid_shape(len(args.tiles))[0]
+        if len(args.tiles) % columns:
+            parser.error(
+                f"--tiles has {len(args.tiles)} cells, not whole rows of {columns}"
+            )
+        args.grid_columns = columns
+    elif args.cams is None:
+        args.cams = list(range(len(CAMERA_CONNECTORS)))
+
     if args.model == "pose":
         if args.engine is None:
             parser.error("--model pose needs --engine")
@@ -792,9 +878,13 @@ def main():
                 f"{len(args.cams)} cameras exceed --batch-size {args.batch_size}"
             )
 
-    grid_columns, grid_rows = grid_shape(len(args.cams), args.grid_columns)
+    tile_count = len(args.tiles) if args.tiles else len(args.cams)
+    grid_columns, grid_rows = grid_shape(tile_count, args.grid_columns)
     logo = None if args.no_logo else args.logo
-    if (
+    if args.tiles:
+        if logo is None and not args.no_logo and "logo" in args.tiles:
+            logo = DEFAULT_LOGO
+    elif (
         logo is None
         and not args.no_logo
         and len(args.cams) == grid_columns * grid_rows - 1
@@ -852,14 +942,28 @@ def main():
     hololink.start()
     try:
         hololink.reset()
-        for camera_stream in camera_streams.values():
-            camera_stream.camera.configure(mode)
-            camera_stream.camera.set_analog_gain_reg(args.gain)
+        missing_cams = set()
+        for cam_index, camera_stream in camera_streams.items():
+            try:
+                camera_stream.camera.configure(mode)
+                camera_stream.camera.set_analog_gain_reg(args.gain)
+            except hololink_module.TransactionError as e:
+                # A loose ribbon or an unpowered camera NAKs its first I2C write; a
+                # timeout is the board's control plane, not one camera
+                timed_out = isinstance(e, hololink_module.TimeoutError)
+                if timed_out or len(missing_cams) + 1 == len(camera_streams):
+                    raise
+                missing_cams.add(cam_index)
+                logging.error(
+                    f"camera {cam_index} ({CAMERA_CONNECTORS[cam_index]}) did not"
+                    f" answer at start-up, continuing without it: {e}"
+                )
         application = PlayerApplication(
             args,
             cu_context,
             cu_device_ordinal,
             camera_streams,
+            missing_cams,
             window_width,
             window_height,
             logo,
