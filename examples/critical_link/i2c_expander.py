@@ -66,11 +66,12 @@ class PCAL6408AIOExpander:
     # PCAL6408A 8-bit GPIO expander (U74, address 0x21) on mux channel 5. It drives the
     # IO1/IO2 lines of the three cameras that have no FPGA pins for them:
     # P0/P1 = CAM6 (J24), P2/P3 = CAM7 (J25), P4/P5 = CAM8 (J26); P6/P7 unused.
-    # Every pin powers up as an input, so these cameras stay disabled until the host
+    # Every pin powers up as an input, so these cameras stay off until the host
     # configures the expander.
     I2C_EXPANDER_ADDRESS = 0x21
     OUTPUT_PORT = 0x01
     CONFIGURATION = 0x03  # 1 = input; power-on default 0xFF
+    CAMERA_IO_OUTPUTS = 0xC0  # P0-P5 outputs, P6/P7 inputs
 
     def __init__(self, hololink_handle, i2c_bus):
         self._i2c = hololink_handle.get_i2c(i2c_bus)
@@ -86,8 +87,28 @@ class PCAL6408AIOExpander:
             0,
         )
 
-    def enable_camera_ios(self):
-        # Drive P0-P5 high, the level the FPGA holds on cam1-5 io1/io2. The output
-        # register is written first so the pins never drive low on the switch to output.
-        self.write_register(self.OUTPUT_PORT, 0xFF)
-        self.write_register(self.CONFIGURATION, 0xC0)
+    def read_register(self, register):
+        write_bytes = bytearray(100)
+        serializer = hololink.Serializer(write_bytes)
+        serializer.append_uint8(register)
+        reply = self._i2c.i2c_transaction(
+            self.I2C_EXPANDER_ADDRESS,
+            serializer.data(),
+            1,
+        )
+        return hololink.Deserializer(reply).next_uint8()
+
+    def camera_ios_off(self):
+        # Drive P0-P5 low. The output register is written first so the pins never drive
+        # high on the switch to output (its power-on value is 0xFF).
+        self.write_register(self.OUTPUT_PORT, 0x00)
+        self.write_register(self.CONFIGURATION, self.CAMERA_IO_OUTPUTS)
+
+    def set_camera_io1(self, camera, on):
+        # camera 0-2 = CAM6-CAM8; IO1 is P(2 x camera), the other cameras' pins are kept
+        if self.read_register(self.CONFIGURATION) != self.CAMERA_IO_OUTPUTS:
+            self.camera_ios_off()
+        bit = 1 << (2 * camera)
+        value = self.read_register(self.OUTPUT_PORT)
+        value = value | bit if on else value & ~bit
+        self.write_register(self.OUTPUT_PORT, value)

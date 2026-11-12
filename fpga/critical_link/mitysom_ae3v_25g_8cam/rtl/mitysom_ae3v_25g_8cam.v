@@ -73,7 +73,7 @@ module mitysom_ae3v_25g_8cam
       dbg_led_1,
       dbg_led_2,
 
-      // MitySOM-A5E STD camera enable IOs (driven high to power on the cameras)
+      // MitySOM-A5E STD camera IOs (HSB GPIO, low until the host turns a camera on)
       cam1_io1,
       cam1_io2,
       cam2_io1,
@@ -142,7 +142,7 @@ module mitysom_ae3v_25g_8cam
    output wire    dbg_led_1;
    output wire    dbg_led_2;
 
-   // MitySOM-A5E STD camera enable IOs (HVIO bank 5B, 3.3V) - driven high to enable cameras
+   // MitySOM-A5E STD camera IOs (HVIO bank 5B, 3.3V), driven by HSB GPIO
    output wire    cam1_io1;
    output wire    cam1_io2;
    output wire    cam2_io1;
@@ -175,6 +175,7 @@ module mitysom_ae3v_25g_8cam
    wire    i_i2c_1_sda;
    wire    o_i2c_1_scl_en;
    wire    o_i2c_1_sda_en;
+   wire  [9:0]  cam_gpio;
 
    // Code auto-generated from script: mipi_subsystem
    wire  [31:0]  mipi_pio_0_in;
@@ -239,6 +240,8 @@ module mitysom_ae3v_25g_8cam
        .hsb_subsystem_c_i2c_1_i_i2c_sda  (i_i2c_1_sda),
        .hsb_subsystem_c_i2c_1_o_i2c_scl_en  (o_i2c_1_scl_en),
        .hsb_subsystem_c_i2c_1_o_i2c_sda_en  (o_i2c_1_sda_en),
+       .hsb_subsystem_c_gpio_o_gpio  (cam_gpio),
+       .hsb_subsystem_c_gpio_i_gpio  (cam_gpio),
 
       // Code auto-generated from script: mipi_subsystem
        .mipi_subsystem_c_ext_conn_in_port  (mipi_pio_0_in),
@@ -286,17 +289,10 @@ module mitysom_ae3v_25g_8cam
    assign dbg_led_1 = eth_pll_lock;
    assign dbg_led_2 = rx_is_lockedtodata;
 
-   // MitySOM-A5E STD: drive camera enable IOs high to power on / enable all cameras (for I2C).
-   assign cam1_io1 = 1'b1;
-   assign cam1_io2 = 1'b1;
-   assign cam2_io1 = 1'b1;
-   assign cam2_io2 = 1'b1;
-   assign cam3_io1 = 1'b1;
-   assign cam3_io2 = 1'b1;
-   assign cam4_io1 = 1'b1;
-   assign cam4_io2 = 1'b1;
-   assign cam5_io1 = 1'b1;
-   assign cam5_io2 = 1'b1;
+   // HSB GPIO pin 2 x camera + (IO - 1) drives camera IO1/IO2. The outputs also feed the GPIO
+   // inputs: the host sets one pin by reading the input register and writing the output register.
+   assign {cam5_io2, cam5_io1, cam4_io2, cam4_io1, cam3_io2, cam3_io1,
+           cam2_io2, cam2_io1, cam1_io2, cam1_io1} = cam_gpio;
 
 endmodule
 

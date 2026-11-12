@@ -46,6 +46,9 @@ foreach v_i2c_name {i2c_0 i2c_1} {
     }
 }
 
+# Camera IO lines, set by the host through HSB GPIO
+set_false_path -to [get_ports {cam*_io*}]
+
 # HOLOLINK IP
 set v_hololink_ip [get_entity_instances HOLOLINK_top]
 

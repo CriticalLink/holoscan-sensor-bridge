@@ -63,7 +63,8 @@ Prebuilt images for each design are attached to this repository's
   image, plus `<design>.sof` for loading the fabric over JTAG
 
 [`fpga/critical_link/README.md`](fpga/critical_link/README.md) has the programming
-steps and the details of each design.
+steps and the details of each design. Use the FPGA image and the `examples/` host
+software from the same release: the host software turns the cameras on.
 
 To build a design yourself, with Quartus Prime Pro 26.1 and the free MIPI IP licenses,
 run `fpga/critical_link/build.tcl`, which writes the SOF and the flash images; see the

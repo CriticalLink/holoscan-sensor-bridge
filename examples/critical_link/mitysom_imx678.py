@@ -19,8 +19,9 @@
 # The baseboard differs from Altera's devkit in three ways:
 # - All eight cameras sit at I2C address 0x1A behind a PCA9548A switch (U43), one mux
 #   channel per camera, so every camera register access selects its channel first.
-# - Cameras 5-7 take their IO1/IO2 enables from a PCAL6408A expander (U74) on mux
-#   channel 5 instead of FPGA pins.
+# - Each camera is powered by its connector's IO1 line (IO2 is not used): cameras 0-4
+#   from HSB GPIO, cameras 5-7 from a PCAL6408A expander (U74) on mux channel 5. Both
+#   are off until the host turns a camera on.
 # - The camera modules carry a 24 MHz INCK oscillator, not the 37.125 MHz the Framos
 #   register tables assume.
 
@@ -44,8 +45,14 @@ CAMERA_CONNECTORS = ("J16", "J15", "J17", "J18", "J20", "J24", "J25", "J26")
 # Cameras at or above this index get IO1/IO2 from the PCAL6408A
 FIRST_EXPANDER_CAMERA = 5
 
-# Settling time after the PCAL6408A raises IO1/IO2, before the first sensor write
-CAM_IO_ENABLE_WAIT_MS = 100
+# HSB GPIO pin 2 x camera + (IO - 1) drives IO1/IO2 of cameras 0-4
+CAM_GPIO_PIN_COUNT = 2 * FIRST_EXPANDER_CAMERA
+
+# Settling time after a camera's IO1 rises, before the first sensor write
+CAM_POWER_ON_WAIT_MS = 100
+
+# IO1 low time for the camera supplies to fall, so the next power-on resets the sensor
+CAM_POWER_OFF_WAIT_MS = 100
 
 # INCK_SEL (0x3014) = 0x04 selects a 24 MHz INCK (IMX678 Software Reference Manual)
 INCK_SEL_REGISTER = 0x3014
@@ -60,6 +67,20 @@ mitysom_imx678_base_settings = [
     (register, INCK_SEL_24MHZ if register == INCK_SEL_REGISTER else value)
     for register, value in imx678_base_settings
 ]
+
+
+# Drives IO1 and IO2 of all eight cameras low and waits for the supplies to fall
+def power_off_cameras(hololink, i2c_bus=hololink_module.BL_I2C_BUS):
+    gpio = hololink.get_gpio(
+        hololink_module.Metadata({"gpio_pin_count": CAM_GPIO_PIN_COUNT})
+    )
+    for pin in range(CAM_GPIO_PIN_COUNT):
+        gpio.set_value(pin, gpio.LOW)
+    mux = i2c_expander.PCA9548AI2CExpander(hololink, i2c_bus)
+    with cam_i2c_lock:
+        mux.configure(i2c_expander.I2C_Expander_Output_EN.CHANNEL_5.value)
+        i2c_expander.PCAL6408AIOExpander(hololink, i2c_bus).camera_ios_off()
+    time.sleep(CAM_POWER_OFF_WAIT_MS / 1000)
 
 
 class MitySomImx678(FramosImx678):
@@ -79,20 +100,34 @@ class MitySomImx678(FramosImx678):
         self._mux = i2c_expander.PCA9548AI2CExpander(self._hololink, i2c_bus)
         self._mux_channel = 1 << camera_id
         self._io_expander = None
+        self._gpio = None
         if camera_id >= FIRST_EXPANDER_CAMERA:
             self._io_expander = i2c_expander.PCAL6408AIOExpander(
                 self._hololink, i2c_bus
+            )
+        else:
+            self._gpio = self._hololink.get_gpio(
+                hololink_module.Metadata({"gpio_pin_count": CAM_GPIO_PIN_COUNT})
             )
 
     def get_name(self):
         return DRIVER_NAME
 
-    def configure(self, mode):
+    # IO1 powers the sensor
+    def set_power(self, on):
         if self._io_expander is not None:
             with cam_i2c_lock:
                 self._mux.configure(i2c_expander.I2C_Expander_Output_EN.CHANNEL_5.value)
-                self._io_expander.enable_camera_ios()
-            time.sleep(CAM_IO_ENABLE_WAIT_MS / 1000)
+                self._io_expander.set_camera_io1(
+                    self.cam_id - FIRST_EXPANDER_CAMERA, on
+                )
+        else:
+            level = self._gpio.HIGH if on else self._gpio.LOW
+            self._gpio.set_value(2 * self.cam_id, level)
+
+    def configure(self, mode):
+        self.set_power(True)
+        time.sleep(CAM_POWER_ON_WAIT_MS / 1000)
         super().configure(mode)
 
     def _initialize(self, settings):

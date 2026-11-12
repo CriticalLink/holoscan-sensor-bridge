@@ -33,8 +33,12 @@ switch (U43). All cameras answer at I2C address 0x1A.
 | Connector       | J16  | J15  | J17  | J18  | J20  | J24  | J25  | J26  |
 | Baseboard label | CAM1 | CAM2 | CAM3 | CAM4 | CAM5 | CAM6 | CAM7 | CAM8 |
 
-- Cameras 0-4 take their IO1/IO2 enables from FPGA pins, cameras 5-7 from the PCAL6408A
-  expander (U74) on switch channel 5, which the host software sets.
+- A camera is powered by its connector's IO1 line; IO2 is not used. Cameras 0-4 take
+  IO1/IO2 from HSB GPIO pin 2 x camera + (IO - 1), cameras 5-7 from the PCAL6408A
+  expander (U74) on switch channel 5. The GPIO lines are low after FPGA configuration and
+  after an HSB reset, and the expander pins are inputs after power-up, so the host
+  software turns each camera on before configuring it. Host software that does not
+  drive the GPIO leaves cameras 0-4 off.
 - The camera I2C reaches the switch through level shifter U73, enabled with switch S7 on
   its +1.8V side.
 - Each camera link is four MIPI D-PHY lanes at 1782 Mbps into the Agilex 5 hard MIPI

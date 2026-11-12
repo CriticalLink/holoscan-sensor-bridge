@@ -44,7 +44,7 @@ import holoscan
 import numpy as np
 import PIL.Image
 from holoscan.core import ConditionType, IOSpec
-from mitysom_imx678 import CAMERA_CONNECTORS, MitySomImx678
+from mitysom_imx678 import CAMERA_CONNECTORS, MitySomImx678, power_off_cameras
 
 import hololink as hololink_module
 
@@ -942,6 +942,8 @@ def main():
     hololink.start()
     try:
         hololink.reset()
+        # Reset clears the HSB GPIO, not the PCAL6408A: start every camera from off
+        power_off_cameras(hololink)
         missing_cams = set()
         for cam_index, camera_stream in camera_streams.items():
             try:
@@ -970,6 +972,10 @@ def main():
         )
         application.run()
     finally:
+        try:
+            power_off_cameras(hololink)
+        except RuntimeError as e:
+            logging.warning(f"Could not power the cameras off: {e}")
         hololink.stop()
 
     (cu_result,) = cuda.cuDevicePrimaryCtxRelease(cu_device)
