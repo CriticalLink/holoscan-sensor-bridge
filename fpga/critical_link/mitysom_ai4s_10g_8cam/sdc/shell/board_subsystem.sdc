@@ -17,6 +17,9 @@
 # Reset to fpga is asynchronous
 set_false_path -from [get_ports {rst_pb_n}]
 
+# Debug LEDs show slow status signals; their timing does not matter
+set_false_path -to [get_ports {dbg_led_*}]
+
 #=================================================================================
 
 
