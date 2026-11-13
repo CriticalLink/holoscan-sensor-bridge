@@ -1,4 +1,5 @@
 # SPDX-FileCopyrightText: Copyright (c) 2023-2025 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+# SPDX-FileCopyrightText: Copyright (c) 2026 Critical Link, LLC. All rights reserved.
 # SPDX-License-Identifier: Apache-2.0
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,7 +15,6 @@
 # limitations under the License.
 
 import importlib
-import sys
 
 # Define operator modules and classes for lazy loading
 _MODULES = [
@@ -55,22 +55,13 @@ def __dir__():
     return __all__
 
 
-# Lazily load modules and classes
+# Lazily load modules and classes. importlib.import_module returns a module already in
+# sys.modules and, while another thread is still importing it, waits for that import to
+# finish; sys.modules alone would hand out the partly initialized module.
 def __getattr__(attr):
     if attr in _OBJECTS:
-        module_name = ".".join([__name__, _OBJECTS[attr]])
-        if module_name in sys.modules:  # cached
-            module = sys.modules[module_name]
-        else:
-            module = importlib.import_module(module_name)  # import
-            sys.modules[module_name] = module  # cache
+        module = importlib.import_module(".".join([__name__, _OBJECTS[attr]]))
         return getattr(module, attr)
     if attr in _MODULES:
-        module_name = f"{__name__}.{attr}"
-        if module_name in sys.modules:  # cached
-            module = sys.modules[module_name]
-        else:
-            module = importlib.import_module(module_name)  # import
-            sys.modules[module_name] = module  # cache
-        return module
+        return importlib.import_module(f"{__name__}.{attr}")
     raise AttributeError(f"module {__name__} has no attribute {attr}")
