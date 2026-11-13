@@ -4243,7 +4243,7 @@ Altera and sold by Altera or its authorized distributors.-->
         <ipxact:parameter parameterId="SIF_RX_0_PACKETIZER_EN" type="int">
           <ipxact:name>SIF_RX_0_PACKETIZER_EN</ipxact:name>
           <ipxact:displayName>Sensor RX 0 Packetizer</ipxact:displayName>
-          <ipxact:value>0</ipxact:value>
+          <ipxact:value>1</ipxact:value>
         </ipxact:parameter>
         <ipxact:parameter parameterId="SIF_RX_0_VP_COUNT" type="int">
           <ipxact:name>SIF_RX_0_VP_COUNT</ipxact:name>
@@ -4273,7 +4273,7 @@ Altera and sold by Altera or its authorized distributors.-->
         <ipxact:parameter parameterId="SIF_RX_1_PACKETIZER_EN" type="int">
           <ipxact:name>SIF_RX_1_PACKETIZER_EN</ipxact:name>
           <ipxact:displayName>Sensor RX 1 Packetizer</ipxact:displayName>
-          <ipxact:value>0</ipxact:value>
+          <ipxact:value>1</ipxact:value>
         </ipxact:parameter>
         <ipxact:parameter parameterId="SIF_RX_1_VP_COUNT" type="int">
           <ipxact:name>SIF_RX_1_VP_COUNT</ipxact:name>
@@ -4303,7 +4303,7 @@ Altera and sold by Altera or its authorized distributors.-->
         <ipxact:parameter parameterId="SIF_RX_2_PACKETIZER_EN" type="int">
           <ipxact:name>SIF_RX_2_PACKETIZER_EN</ipxact:name>
           <ipxact:displayName>Sensor RX 2 Packetizer</ipxact:displayName>
-          <ipxact:value>0</ipxact:value>
+          <ipxact:value>1</ipxact:value>
         </ipxact:parameter>
         <ipxact:parameter parameterId="SIF_RX_2_VP_COUNT" type="int">
           <ipxact:name>SIF_RX_2_VP_COUNT</ipxact:name>
@@ -4333,7 +4333,7 @@ Altera and sold by Altera or its authorized distributors.-->
         <ipxact:parameter parameterId="SIF_RX_3_PACKETIZER_EN" type="int">
           <ipxact:name>SIF_RX_3_PACKETIZER_EN</ipxact:name>
           <ipxact:displayName>Sensor RX 3 Packetizer</ipxact:displayName>
-          <ipxact:value>0</ipxact:value>
+          <ipxact:value>1</ipxact:value>
         </ipxact:parameter>
         <ipxact:parameter parameterId="SIF_RX_3_VP_COUNT" type="int">
           <ipxact:name>SIF_RX_3_VP_COUNT</ipxact:name>
@@ -4363,7 +4363,7 @@ Altera and sold by Altera or its authorized distributors.-->
         <ipxact:parameter parameterId="SIF_RX_4_PACKETIZER_EN" type="int">
           <ipxact:name>SIF_RX_4_PACKETIZER_EN</ipxact:name>
           <ipxact:displayName>Sensor RX 4 Packetizer</ipxact:displayName>
-          <ipxact:value>0</ipxact:value>
+          <ipxact:value>1</ipxact:value>
         </ipxact:parameter>
         <ipxact:parameter parameterId="SIF_RX_4_VP_COUNT" type="int">
           <ipxact:name>SIF_RX_4_VP_COUNT</ipxact:name>
@@ -4393,7 +4393,7 @@ Altera and sold by Altera or its authorized distributors.-->
         <ipxact:parameter parameterId="SIF_RX_5_PACKETIZER_EN" type="int">
           <ipxact:name>SIF_RX_5_PACKETIZER_EN</ipxact:name>
           <ipxact:displayName>Sensor RX 5 Packetizer</ipxact:displayName>
-          <ipxact:value>0</ipxact:value>
+          <ipxact:value>1</ipxact:value>
         </ipxact:parameter>
         <ipxact:parameter parameterId="SIF_RX_5_VP_COUNT" type="int">
           <ipxact:name>SIF_RX_5_VP_COUNT</ipxact:name>
@@ -4423,7 +4423,7 @@ Altera and sold by Altera or its authorized distributors.-->
         <ipxact:parameter parameterId="SIF_RX_6_PACKETIZER_EN" type="int">
           <ipxact:name>SIF_RX_6_PACKETIZER_EN</ipxact:name>
           <ipxact:displayName>Sensor RX 6 Packetizer</ipxact:displayName>
-          <ipxact:value>0</ipxact:value>
+          <ipxact:value>1</ipxact:value>
         </ipxact:parameter>
         <ipxact:parameter parameterId="SIF_RX_6_VP_COUNT" type="int">
           <ipxact:name>SIF_RX_6_VP_COUNT</ipxact:name>
@@ -4453,7 +4453,7 @@ Altera and sold by Altera or its authorized distributors.-->
         <ipxact:parameter parameterId="SIF_RX_7_PACKETIZER_EN" type="int">
           <ipxact:name>SIF_RX_7_PACKETIZER_EN</ipxact:name>
           <ipxact:displayName>Sensor RX 7 Packetizer</ipxact:displayName>
-          <ipxact:value>0</ipxact:value>
+          <ipxact:value>1</ipxact:value>
         </ipxact:parameter>
         <ipxact:parameter parameterId="SIF_RX_7_VP_COUNT" type="int">
           <ipxact:name>SIF_RX_7_VP_COUNT</ipxact:name>

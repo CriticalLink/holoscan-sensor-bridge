@@ -13,8 +13,6 @@
 
 
 set_global_assignment -name VERILOG_MACRO "PSG=1"
-# The host receives over the Linux network stack, so the CoE (IEEE 1722B) packet path is unused
-set_global_assignment -name VERILOG_MACRO "DISABLE_COE"
 
 # MitySOM-A5E STD -6/-7 baseboard: only i2c_0 is used. It drives I2C_EMAC0_SCL/SDA_OVRRIDE_1V3
 # (bank 2A, 1.3 V), which the LSF0102 level shifter U73 passes onto I2C_EMAC0, the bus of the

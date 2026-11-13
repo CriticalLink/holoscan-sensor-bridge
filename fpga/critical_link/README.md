@@ -50,9 +50,11 @@ switch (U43). All cameras answer at I2C address 0x1A.
   with a BOOTP broadcast once a second. Its Ethernet MAC does not answer ARP, so the
   host needs a static neighbour entry (see
   `examples/critical_link/thor_network_setup.sh`).
-- The host receives over the Linux network stack (`LinuxReceiverOperator`). The HSB IP's
-  sensor packetizers and its CoE (IEEE 1722B) packet path are left out of these builds,
-  so the Jetson's hardware CoE capture (`FusaCoeCaptureOp`) is not supported.
+- The host receives over the Linux network stack (`LinuxReceiverOperator`) or over the
+  Jetson's hardware CoE (IEEE 1722B) capture (`FusaCoeCaptureOp`); the HSB IP's CoE
+  packet path and the sensor packetizers of all eight cameras are built in for that.
+  The Thor's capture engine takes at most five CoE streams per port. Images from
+  `cl-release-2.6.0-1` are built without the CoE path, so CoE needs a later image.
 
 ## Build
 

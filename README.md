@@ -122,11 +122,43 @@ logo in the centre of the 3x3 grid. Useful options:
 | `--grid-columns N`             | tiles per row (default near-square: 3 for 7-9 tiles)                        |
 | `--tiles 0,-,1,-,logo,-,2,-,3` | cells in reading order: a camera, `logo` or `-` (blank)                     |
 | `--model pose --engine <file>` | YOLO11 body pose on every camera                                            |
+| `--coe`                        | the first 3 cameras that answer on the hardware CoE capture (see below)     |
+| `--coe 0,1,2`                  | the listed cameras (at most 3) on the hardware CoE capture                  |
+| `--force-coe`                  | allow `--coe` up to 5 cameras (see below)                                   |
 
 A camera that does not answer at start-up (a loose ribbon, no power) is left out and its
 tile shows NO CAMERA; a camera that stops sending frames shows NO SIGNAL. The player
 exits if no camera answers. A `--tiles` list must fill whole rows of `--grid-columns`
 cells (pad with `-`); write a list that starts with `-` as `--tiles=-,0,...`.
+
+### Hardware CoE capture
+
+Hardware CoE capture is experimental; the Linux receiver is the supported path. By
+default the Thor receives the camera streams over the Linux network stack. With `--coe`
+it receives up to three of them with its hardware Camera over Ethernet (CoE, IEEE 1722B)
+capture instead, which takes the packets off the CPU, and the rest over the Linux
+network stack, in the same window. `--coe` alone puts the first three cameras that
+answer at start-up on CoE; `--coe 1,3,5` names them. The `docker/build.sh --igpu`
+container on an AGX Thor includes the CoE capture operator.
+
+```bash
+sh docker/demo.sh python3 examples/critical_link/mitysom_player.py --coe
+```
+
+Unlike the Linux receiver, the CoE capture stops the player when one of its cameras
+delivers no frame for 1.5 s, instead of showing NO SIGNAL; start the player again. After
+a `--coe` run, run `sudo examples/critical_link/thor_network_setup.sh` again before the
+next start: the port's normal receive path can respond slowly after the CoE streams
+close, until the interface is reset, and the script also moves an interrupt that the CoE
+capture leaves running off CPU0.
+
+With the Thor's CoE capture on JetPack 7.2.1, a `--coe` run can fail to start, or stop
+while streaming: the Thor's port stops receiving, every camera stops, those on
+the Linux receiver included, and the player stops on a CoE capture timeout. The port
+starts receiving again when the player exits; run the network setup script as after any
+`--coe` run and start the player again. This happens more often with more cameras on CoE
+and with `--model pose`. The capture engine takes up to five CoE streams per port, and
+`--force-coe` lets `--coe` use four or five cameras.
 
 ### Body pose
 

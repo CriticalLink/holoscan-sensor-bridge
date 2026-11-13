@@ -25,16 +25,23 @@
 # goes dead shows a "NO SIGNAL" tile instead of stalling the window. A camera that does
 # not answer at start-up is left out and its tile shows "NO CAMERA". --model pose runs
 # YOLO11 body pose on every camera through one batched TensorRT engine.
+#
 # The engine is built on the Jetson from the Ultralytics ONNX export at a 384x640
 # input, with a batch size of at least the number of cameras:
 #   yolo export model=yolo11n-pose.pt format=onnx imgsz=384,640 batch=8
 #   trtexec --onnx=yolo11n-pose.onnx --saveEngine=yolo11n-pose_b8_384x640.fp16.engine --fp16
+#
+# --coe receives up to three cameras (five with --force-coe) with the Jetson AGX Thor's
+# hardware Camera over Ethernet (CoE) capture and the rest with the Linux receiver, in one
+# application. A CoE camera that stops delivering frames stops the player instead of
+# showing NO SIGNAL.
 
 import argparse
 import ctypes
 import logging
 import math
 import os
+import signal
 import threading
 import time
 
@@ -55,6 +62,13 @@ DEFAULT_LOGO = os.path.join(
 WINDOW_TITLE = "MitySOM-A5E Holoscan Sensor Bridge"
 
 FPGA_IP = "192.168.0.2"
+
+# The Thor's capture engine takes at most five CoE streams per port, but with more than
+# three its port's receive path can stall (JetPack 7.2.1), stopping every stream on it
+COE_MAX_CAMERAS = 5
+COE_SAFE_CAMERAS = 3
+# A CoE camera that delivers no frame for this long stops the player
+COE_TIMEOUT_MS = 1500
 
 # HSB IP board UUIDs of the Altera Agilex 5 designs, which these designs keep
 UUIDS = ("b26763ac-af25-44f6-850e-dce30f33f4e3", "7b1fa8c7-31aa-44b6-abcc-eac134461fdc")
@@ -97,6 +111,43 @@ class CameraStream:
         self.name = f"cam{cam_idx}-{CAMERA_CONNECTORS[cam_idx]}"
         self.hololink_channel = hololink_channel
         self.camera = camera
+
+
+def interrupt(signum, frame):
+    """SIGINT/SIGTERM handler outside the running application: unwinds through the
+    caller's cleanup (camera power-off) as KeyboardInterrupt."""
+    raise KeyboardInterrupt
+
+
+def run_until_signal(application):
+    """Runs the application until it finishes or SIGINT/SIGTERM asks it to stop.
+
+    Holoscan's own interrupt handler forces the process to exit 3 s after the signal,
+    which can end the shutdown (camera stop, CoE channel close, camera power-off)
+    part way. Stopping the graph from here instead lets the shutdown finish; a second
+    signal abandons it with KeyboardInterrupt.
+    """
+    future = application.run_async()
+    stopping = False
+
+    def stop(signum, frame):
+        nonlocal stopping
+        if stopping:
+            raise KeyboardInterrupt
+        stopping = True
+        logging.info(f"signal {signum}: stopping")
+        application.stop_execution()
+
+    try:
+        while not future.done():
+            # Holoscan installs its handlers as the application starts; take them back
+            for signum in (signal.SIGINT, signal.SIGTERM):
+                signal.signal(signum, stop)
+            time.sleep(0.2)
+    finally:
+        for signum in (signal.SIGINT, signal.SIGTERM):
+            signal.signal(signum, interrupt)
+    future.result()
 
 
 def grid_shape(tile_count, columns=None):
@@ -492,7 +543,8 @@ class PoseOverlayOp(TileOverlayOp):
 
 class PlayerApplication(holoscan.core.Application):
     def __init__(self, args, cuda_context, cuda_device_ordinal, camera_streams,
-                 missing_cams, window_width, window_height, logo_path):  # fmt: skip
+                 missing_cams, coe_cams, window_width, window_height,
+                 logo_path):  # fmt: skip
         logging.info("__init__")
         super().__init__()
         self._args = args
@@ -500,6 +552,7 @@ class PlayerApplication(holoscan.core.Application):
         self._cuda_device_ordinal = cuda_device_ordinal
         self._camera_streams = camera_streams
         self._missing_cams = missing_cams
+        self._coe_cams = coe_cams
         self._window_width = window_width
         self._window_height = window_height
         self._logo_path = logo_path
@@ -577,9 +630,9 @@ class PlayerApplication(holoscan.core.Application):
     def _camera_pipeline(self, stream):
         """Receiver through demosaic for one camera; returns (receiver, demosaic)."""
         width, height = stream.camera._width, stream.camera._height
-        csi_to_bayer_pool = holoscan.resources.BlockMemoryPool(
+        converter_pool = holoscan.resources.BlockMemoryPool(
             self,
-            name=f"csi_pool-{stream.name}",
+            name=f"converter_pool-{stream.name}",
             # storage_type of 1 is device memory
             storage_type=1,
             block_size=width * ctypes.sizeof(ctypes.c_uint16) * height,
@@ -595,25 +648,48 @@ class PlayerApplication(holoscan.core.Application):
         condition = holoscan.conditions.BooleanCondition(
             self, name=f"ok-{stream.name}", enable_tick=True
         )
-        csi_to_bayer = hololink_module.operators.CsiToBayerOp(
-            self,
-            name=f"csi_to_bayer-{stream.name}",
-            allocator=csi_to_bayer_pool,
-            cuda_device_ordinal=self._cuda_device_ordinal,
-            out_tensor_name=stream.name,
-        )
-        stream.camera.configure_converter(csi_to_bayer)
-        receiver = hololink_module.operators.LinuxReceiverOperator(
-            self,
-            condition,
-            name=f"receiver-{stream.name}",
-            frame_size=csi_to_bayer.get_csi_length(),
-            frame_context=self._cuda_context,
-            hololink_channel=stream.hololink_channel,
-            device=stream.camera,
-            # spread the receivers over distinct CPUs
-            receiver_affinity={2 + stream.cam_idx},
-        )
+        if stream.cam_idx in self._coe_cams:
+            metadata = stream.hololink_channel.enumeration_metadata()
+            receiver = hololink_module.operators.FusaCoeCaptureOp(
+                self,
+                condition,
+                name=f"receiver-{stream.name}",
+                interface=metadata.get("interface"),
+                mac_addr=list(bytes.fromhex(metadata.get("mac_id").replace(":", ""))),
+                hololink_channel=stream.hololink_channel,
+                timeout=COE_TIMEOUT_MS,
+                device=stream.camera,
+            )
+            stream.camera.configure_converter(receiver)
+            # Unpacks the CoE frame's packed lines into 16-bit Bayer
+            converter = hololink_module.operators.PackedFormatConverterOp(
+                self,
+                name=f"converter-{stream.name}",
+                allocator=converter_pool,
+                cuda_device_ordinal=self._cuda_device_ordinal,
+                out_tensor_name=stream.name,
+            )
+            receiver.configure_converter(converter)
+        else:
+            converter = hololink_module.operators.CsiToBayerOp(
+                self,
+                name=f"converter-{stream.name}",
+                allocator=converter_pool,
+                cuda_device_ordinal=self._cuda_device_ordinal,
+                out_tensor_name=stream.name,
+            )
+            stream.camera.configure_converter(converter)
+            receiver = hololink_module.operators.LinuxReceiverOperator(
+                self,
+                condition,
+                name=f"receiver-{stream.name}",
+                frame_size=converter.get_csi_length(),
+                frame_context=self._cuda_context,
+                hololink_channel=stream.hololink_channel,
+                device=stream.camera,
+                # spread the receivers over distinct CPUs
+                receiver_affinity={2 + stream.cam_idx},
+            )
         bayer_format = stream.camera.bayer_format()
         image_processor = hololink_module.operators.ImageProcessorOp(
             self,
@@ -632,8 +708,8 @@ class PlayerApplication(holoscan.core.Application):
             out_tensor_name=stream.name,
             generate_alpha=False,
         )
-        self.add_flow(receiver, csi_to_bayer, {("output", "input")})
-        self.add_flow(csi_to_bayer, image_processor, {("output", "input")})
+        self.add_flow(receiver, converter, {("output", "input")})
+        self.add_flow(converter, image_processor, {("output", "input")})
         self.add_flow(image_processor, demosaic, {("output", "receiver")})
         return receiver, demosaic
 
@@ -723,7 +799,8 @@ class PlayerApplication(holoscan.core.Application):
             holoscan.schedulers.MultiThreadScheduler(
                 self,
                 name="multithread_scheduler",
-                worker_thread_number=8,
+                # A CoE receiver holds a worker thread while it waits for each frame
+                worker_thread_number=8 + len(self._coe_cams),
                 stop_on_deadlock=True,
             )
         )
@@ -747,6 +824,22 @@ def main():
         " with --grid-columns cells per row, e.g. --grid-columns 3"
         " --tiles 0,-,1,-,logo,-,2,-,3 (a list that starts with - needs"
         " --tiles=-,...)",
+    )
+    parser.add_argument(
+        "--coe",
+        nargs="?",
+        const="",
+        default=None,
+        help="experimental: receive up to three cameras with the Jetson AGX Thor's hardware"
+        " CoE capture and the rest with the Linux receiver: a comma-separated list, or no list for"
+        " the first three cameras that answer at start-up (needs FPGA images built with"
+        " CoE)",
+    )
+    parser.add_argument(
+        "--force-coe",
+        action="store_true",
+        help="allow --coe up to five cameras; with more than three the Thor's port can"
+        " stall, stopping every camera, Linux receiver ones included",
     )
     parser.add_argument(
         "--resolution",
@@ -867,6 +960,32 @@ def main():
         args.grid_columns = columns
     elif args.cams is None:
         args.cams = list(range(len(CAMERA_CONNECTORS)))
+    coe_list = None
+    if args.force_coe and args.coe is None:
+        parser.error("--force-coe needs --coe")
+    if args.coe is not None:
+        # The operators module imports the operator on first use, so a build without
+        # it raises ImportError here, not AttributeError
+        try:
+            hololink_module.operators.FusaCoeCaptureOp
+        except (AttributeError, ImportError):
+            parser.error(
+                "--coe needs the Jetson AGX Thor build with the CoE capture operator"
+            )
+    if args.coe:
+        try:
+            coe_list = parse_camera_list(args.coe)
+        except argparse.ArgumentTypeError as e:
+            parser.error(f"--coe: {e}")
+        if len(coe_list) > COE_MAX_CAMERAS:
+            parser.error(f"--coe takes at most {COE_MAX_CAMERAS} cameras")
+        if len(coe_list) > COE_SAFE_CAMERAS and not args.force_coe:
+            parser.error(
+                f"--coe with more than {COE_SAFE_CAMERAS} cameras can stall every"
+                " stream on the Thor's port; add --force-coe to run it anyway"
+            )
+        if not set(coe_list) <= set(args.cams):
+            parser.error("--coe names a camera that is not streamed")
 
     if args.model == "pose":
         if args.engine is None:
@@ -939,6 +1058,10 @@ def main():
     )
 
     hololink = first_stream.hololink_channel.hololink()
+    previous_handlers = {
+        signum: signal.signal(signum, interrupt)
+        for signum in (signal.SIGINT, signal.SIGTERM)
+    }
     hololink.start()
     try:
         hololink.reset()
@@ -960,23 +1083,46 @@ def main():
                     f"camera {cam_index} ({CAMERA_CONNECTORS[cam_index]}) did not"
                     f" answer at start-up, continuing without it: {e}"
                 )
+        # CoE goes to the listed cameras, or to the first three (five with --force-coe)
+        # that answered
+        present = [c for c in args.cams if c not in missing_cams]
+        coe_cams = set()
+        if args.coe is not None:
+            limit = COE_MAX_CAMERAS if args.force_coe else COE_SAFE_CAMERAS
+            coe_cams = set(coe_list or present[:limit]) - missing_cams
+            if coe_list and missing_cams & set(coe_list):
+                logging.warning(
+                    f"--coe cameras {sorted(missing_cams & set(coe_list))} did not answer"
+                )
+            if len(coe_cams) > COE_SAFE_CAMERAS:
+                logging.warning(
+                    f"{len(coe_cams)} cameras on CoE: the Thor's port can stall,"
+                    " stopping every camera"
+                )
+            logging.info(
+                f"cameras on CoE: {sorted(coe_cams)}, on the Linux receiver:"
+                f" {[c for c in present if c not in coe_cams]}"
+            )
         application = PlayerApplication(
             args,
             cu_context,
             cu_device_ordinal,
             camera_streams,
             missing_cams,
+            coe_cams,
             window_width,
             window_height,
             logo,
         )
-        application.run()
+        run_until_signal(application)
     finally:
         try:
             power_off_cameras(hololink)
         except RuntimeError as e:
             logging.warning(f"Could not power the cameras off: {e}")
         hololink.stop()
+        for signum, handler in previous_handlers.items():
+            signal.signal(signum, handler)
 
     (cu_result,) = cuda.cuDevicePrimaryCtxRelease(cu_device)
     assert cu_result == cuda.CUresult.CUDA_SUCCESS
