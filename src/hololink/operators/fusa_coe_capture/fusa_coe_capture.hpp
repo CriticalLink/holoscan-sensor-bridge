@@ -1,5 +1,6 @@
 /*
  * SPDX-FileCopyrightText: Copyright (c) 2025 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+ * SPDX-FileCopyrightText: Copyright (c) 2026 Critical Link, LLC. All rights reserved.
  * SPDX-License-Identifier: Apache-2.0
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -79,6 +80,7 @@ private:
     void unregister_buffers();
     bool issue_capture();
     void acquire_buffer_thread_func();
+    void acquire_buffers();
 
     const uint32_t capture_queue_depth_ = 4;
 
@@ -134,6 +136,7 @@ private:
     std::deque<BufferInfo*> available_buffers_; // Buffers available for new capture requests.
     std::queue<BufferInfo*> in_flight_captures_; // Buffers in use for in-flight captures.
     BufferInfo* acquired_buffer_ = nullptr; // Last buffer acquired from capture.
+    std::string capture_error_; // Set by the acquisition thread when a capture fails.
 
     uint32_t next_reissue_index_ = 0; // Next expected buffer index for FIFO-ordered issue.
 
@@ -141,6 +144,10 @@ private:
     // been released. This map is static since the callback provides only the CUDA device pointer.
     static std::map<void*, BufferInfo*> pending_buffers_;
     static std::mutex pending_buffers_mutex_;
+
+    // NvFusa fails CoE channels that open and start concurrently (CHANNEL_ERROR on open, or
+    // captures that time out), so operators open, start and close their channels one at a time.
+    static std::mutex channel_mutex_;
 };
 
 } // namespace hololink::operators

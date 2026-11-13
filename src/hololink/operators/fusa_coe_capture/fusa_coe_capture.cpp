@@ -1,5 +1,6 @@
 /*
  * SPDX-FileCopyrightText: Copyright (c) 2025 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+ * SPDX-FileCopyrightText: Copyright (c) 2026 Critical Link, LLC. All rights reserved.
  * SPDX-License-Identifier: Apache-2.0
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -49,6 +50,7 @@ namespace hololink::operators {
 
 std::map<void*, FusaCoeCaptureOp::BufferInfo*> FusaCoeCaptureOp::pending_buffers_;
 std::mutex FusaCoeCaptureOp::pending_buffers_mutex_;
+std::mutex FusaCoeCaptureOp::channel_mutex_;
 
 void FusaCoeCaptureOp::setup(holoscan::OperatorSpec& spec)
 {
@@ -75,6 +77,8 @@ void FusaCoeCaptureOp::start()
     if (!configured_) {
         throw std::runtime_error("FusaCoeCaptureOp is not configured.");
     }
+
+    std::lock_guard<std::mutex> channel_lock(channel_mutex_);
 
     // Initialize CUDA.
     CudaCheck(cuInit(0));
@@ -133,6 +137,7 @@ void FusaCoeCaptureOp::start()
     }
 
     // Start the capture acquisition thread.
+    capture_error_.clear();
     stop_thread_.store(false);
     acquire_thread_ = std::thread(&FusaCoeCaptureOp::acquire_buffer_thread_func, this);
 }
@@ -152,6 +157,7 @@ void FusaCoeCaptureOp::stop()
 
     // Unregister buffers and close NvFusa channel.
     if (coe_handler_ != nullptr) {
+        std::lock_guard<std::mutex> channel_lock(channel_mutex_);
         unregister_buffers();
         INvFusaCapture::closeHandler(coe_handler_);
         coe_handler_ = nullptr;
@@ -171,6 +177,26 @@ void FusaCoeCaptureOp::stop()
 }
 
 void FusaCoeCaptureOp::acquire_buffer_thread_func()
+{
+    try {
+        acquire_buffers();
+    } catch (const std::exception& e) {
+        // An exception here would end the process; compute() raises it on the operator's
+        // thread instead, so the application stops normally.
+        std::lock_guard<std::mutex> lock(buffer_mutex_);
+        capture_error_ = e.what();
+        buffer_acquired_.notify_all();
+    }
+
+    // Return any unused buffers.
+    std::lock_guard<std::mutex> lock(buffer_mutex_);
+    if (acquired_buffer_) {
+        available_buffers_.push_back(acquired_buffer_);
+        acquired_buffer_ = nullptr;
+    }
+}
+
+void FusaCoeCaptureOp::acquire_buffers()
 {
     while (!stop_thread_.load()) {
         // Wait for a buffer to reissue if we've drained all in-flight captures.
@@ -202,13 +228,6 @@ void FusaCoeCaptureOp::acquire_buffer_thread_func()
         // Reissue capture requests for any available buffers.
         while (issue_capture()) { }
     }
-
-    // Return any unused buffers.
-    std::lock_guard<std::mutex> lock(buffer_mutex_);
-    if (acquired_buffer_) {
-        available_buffers_.push_back(acquired_buffer_);
-        acquired_buffer_ = nullptr;
-    }
 }
 
 void FusaCoeCaptureOp::compute(holoscan::InputContext& op_input,
@@ -219,10 +238,16 @@ void FusaCoeCaptureOp::compute(holoscan::InputContext& op_input,
     std::unique_lock<std::mutex> lock(buffer_mutex_);
     BufferInfo* buffer = acquired_buffer_;
     while (buffer == nullptr) {
+        if (!capture_error_.empty()) {
+            throw std::runtime_error(capture_error_);
+        }
         HSB_LOG_TRACE("Waiting for buffer for output \"{}\" (timeout = {}ms)...",
             out_tensor_name_.get(), timeout_.get());
         auto status = buffer_acquired_.wait_for(lock, std::chrono::milliseconds(timeout_.get()));
         if (status == std::cv_status::timeout) {
+            if (!capture_error_.empty()) {
+                throw std::runtime_error(capture_error_);
+            }
             throw std::runtime_error(fmt::format("Failed to get buffer for output \"{}\"", out_tensor_name_.get()));
         }
         buffer = acquired_buffer_;
