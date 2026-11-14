@@ -2459,7 +2459,7 @@ Altera and sold by Altera or its authorized distributors.-->
           <ipxact:vectors>
             <ipxact:vector>
               <ipxact:left>0</ipxact:left>
-              <ipxact:right>63</ipxact:right>
+              <ipxact:right>127</ipxact:right>
             </ipxact:vector>
           </ipxact:vectors>
           <ipxact:wireTypeDefs>
@@ -2477,7 +2477,7 @@ Altera and sold by Altera or its authorized distributors.-->
           <ipxact:vectors>
             <ipxact:vector>
               <ipxact:left>0</ipxact:left>
-              <ipxact:right>7</ipxact:right>
+              <ipxact:right>15</ipxact:right>
             </ipxact:vector>
           </ipxact:vectors>
           <ipxact:wireTypeDefs>
@@ -2547,7 +2547,7 @@ Altera and sold by Altera or its authorized distributors.-->
           <ipxact:vectors>
             <ipxact:vector>
               <ipxact:left>0</ipxact:left>
-              <ipxact:right>63</ipxact:right>
+              <ipxact:right>127</ipxact:right>
             </ipxact:vector>
           </ipxact:vectors>
           <ipxact:wireTypeDefs>
@@ -2565,7 +2565,7 @@ Altera and sold by Altera or its authorized distributors.-->
           <ipxact:vectors>
             <ipxact:vector>
               <ipxact:left>0</ipxact:left>
-              <ipxact:right>7</ipxact:right>
+              <ipxact:right>15</ipxact:right>
             </ipxact:vector>
           </ipxact:vectors>
           <ipxact:wireTypeDefs>
@@ -5528,7 +5528,7 @@ Altera and sold by Altera or its authorized distributors.-->
         <ipxact:parameter parameterId="HOST_WIDTH" type="int">
           <ipxact:name>HOST_WIDTH</ipxact:name>
           <ipxact:displayName>Host Width</ipxact:displayName>
-          <ipxact:value>64</ipxact:value>
+          <ipxact:value>128</ipxact:value>
         </ipxact:parameter>
         <ipxact:parameter parameterId="HOSTUSER_WIDTH" type="int">
           <ipxact:name>HOSTUSER_WIDTH</ipxact:name>
@@ -5543,7 +5543,7 @@ Altera and sold by Altera or its authorized distributors.-->
         <ipxact:parameter parameterId="HIF_CLK_FREQ" type="int">
           <ipxact:name>HIF_CLK_FREQ</ipxact:name>
           <ipxact:displayName>Host Interface Clock Frequency</ipxact:displayName>
-          <ipxact:value>402832031</ipxact:value>
+          <ipxact:value>266666667</ipxact:value>
         </ipxact:parameter>
         <ipxact:parameter parameterId="SYNC_CLK_HIF_APB" type="int">
           <ipxact:name>SYNC_CLK_HIF_APB</ipxact:name>
@@ -6069,7 +6069,7 @@ Altera and sold by Altera or its authorized distributors.-->
                     &lt;name&gt;i_hif_rx_0_axis_tdata&lt;/name&gt;
                     &lt;role&gt;tdata&lt;/role&gt;
                     &lt;direction&gt;Input&lt;/direction&gt;
-                    &lt;width&gt;64&lt;/width&gt;
+                    &lt;width&gt;128&lt;/width&gt;
                     &lt;lowerBound&gt;0&lt;/lowerBound&gt;
                     &lt;vhdlType&gt;STD_LOGIC_VECTOR&lt;/vhdlType&gt;
                     &lt;terminationValue&gt;0&lt;/terminationValue&gt;
@@ -6078,7 +6078,7 @@ Altera and sold by Altera or its authorized distributors.-->
                     &lt;name&gt;i_hif_rx_0_axis_tkeep&lt;/name&gt;
                     &lt;role&gt;tkeep&lt;/role&gt;
                     &lt;direction&gt;Input&lt;/direction&gt;
-                    &lt;width&gt;8&lt;/width&gt;
+                    &lt;width&gt;16&lt;/width&gt;
                     &lt;lowerBound&gt;0&lt;/lowerBound&gt;
                     &lt;vhdlType&gt;STD_LOGIC_VECTOR&lt;/vhdlType&gt;
                     &lt;terminationValue&gt;0&lt;/terminationValue&gt;
@@ -6149,7 +6149,7 @@ Altera and sold by Altera or its authorized distributors.-->
                     &lt;name&gt;o_hif_tx_0_axis_tdata&lt;/name&gt;
                     &lt;role&gt;tdata&lt;/role&gt;
                     &lt;direction&gt;Output&lt;/direction&gt;
-                    &lt;width&gt;64&lt;/width&gt;
+                    &lt;width&gt;128&lt;/width&gt;
                     &lt;lowerBound&gt;0&lt;/lowerBound&gt;
                     &lt;vhdlType&gt;STD_LOGIC_VECTOR&lt;/vhdlType&gt;
                     &lt;terminationValue&gt;0&lt;/terminationValue&gt;
@@ -6158,7 +6158,7 @@ Altera and sold by Altera or its authorized distributors.-->
                     &lt;name&gt;o_hif_tx_0_axis_tkeep&lt;/name&gt;
                     &lt;role&gt;tkeep&lt;/role&gt;
                     &lt;direction&gt;Output&lt;/direction&gt;
-                    &lt;width&gt;8&lt;/width&gt;
+                    &lt;width&gt;16&lt;/width&gt;
                     &lt;lowerBound&gt;0&lt;/lowerBound&gt;
                     &lt;vhdlType&gt;STD_LOGIC_VECTOR&lt;/vhdlType&gt;
                     &lt;terminationValue&gt;0&lt;/terminationValue&gt;

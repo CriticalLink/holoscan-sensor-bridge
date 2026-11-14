@@ -49,6 +49,12 @@ foreach v_i2c_name {i2c_0 i2c_1} {
 # Camera IO lines, set by the host through HSB GPIO
 set_false_path -to [get_ports {cam*_io*}]
 
+# The HSB host interface clock shares the IOPLL with the video and reference clocks. Every crossing
+# between them goes through a synchronizer (CDC constraints below), so those paths are not timed.
+set_clock_groups -asynchronous \
+    -group [get_clocks {u0|clock_subsystem|iopll_0|iopll_0_outclk2}] \
+    -group [get_clocks {u0|clock_subsystem|iopll_0|iopll_0_clk_0 u0|clock_subsystem|iopll_0|iopll_0_outclk1}]
+
 # HOLOLINK IP
 set v_hololink_ip [get_entity_instances HOLOLINK_top]
 

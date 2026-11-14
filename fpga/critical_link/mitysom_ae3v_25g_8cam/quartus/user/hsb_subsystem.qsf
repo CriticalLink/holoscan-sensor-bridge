@@ -8,4 +8,13 @@ set_global_assignment -name IP_FILE ../rtl/user/ip/hsb_subsystem/hsb_subsystem_h
 set_global_assignment -name IP_FILE ../rtl/user/ip/hsb_subsystem/hsb_subsystem_hif_clk_bridge.ip
 set_global_assignment -name IP_FILE ../rtl/user/ip/hsb_subsystem/hsb_subsystem_cpu_clk_bridge.ip
 set_global_assignment -name IP_FILE ../rtl/user/ip/hsb_subsystem/hsb_subsystem_cpu_rst_bridge.ip
+set_global_assignment -name IP_FILE ../rtl/user/ip/hsb_subsystem/hsb_subsystem_tx_dc_fifo.ip
+set_global_assignment -name IP_FILE ../rtl/user/ip/hsb_subsystem/hsb_subsystem_tx_width_adapter.ip
+set_global_assignment -name IP_FILE ../rtl/user/ip/hsb_subsystem/hsb_subsystem_tx_sf_fifo.ip
+set_global_assignment -name IP_FILE ../rtl/user/ip/hsb_subsystem/hsb_subsystem_hif_rst_sync.ip
+set_global_assignment -name IP_FILE ../rtl/user/ip/hsb_subsystem/hsb_subsystem_eth_clk_bridge.ip
+set_global_assignment -name IP_FILE ../rtl/user/ip/hsb_subsystem/hsb_subsystem_eth_rst_bridge.ip
+set_global_assignment -name IP_FILE ../rtl/user/ip/hsb_subsystem/hsb_subsystem_eth_rst_sync.ip
+set_global_assignment -name IP_FILE ../rtl/user/ip/hsb_subsystem/hsb_subsystem_rx_dc_fifo.ip
+set_global_assignment -name IP_FILE ../rtl/user/ip/hsb_subsystem/hsb_subsystem_rx_width_adapter.ip
 set_global_assignment -name QSYS_FILE ../rtl/user/hsb_subsystem.qsys

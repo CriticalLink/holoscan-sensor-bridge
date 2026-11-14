@@ -15,19 +15,13 @@
 set_global_assignment -name PROJECT_OUTPUT_DIRECTORY              output_files
 set_global_assignment -name NUM_PARALLEL_PROCESSORS               ALL
 set_global_assignment -name VERILOG_INPUT_VERSION                 SYSTEMVERILOG_2012
-set_global_assignment -name OPTIMIZATION_MODE                     "AGGRESSIVE PERFORMANCE"
+set_global_assignment -name OPTIMIZATION_MODE                     "HIGH PERFORMANCE EFFORT"
 set_global_assignment -name MIN_CORE_JUNCTION_TEMP                0
 set_global_assignment -name MAX_CORE_JUNCTION_TEMP                100
 set_global_assignment -name OPTIMIZE_MULTI_CORNER_TIMING          ON
 set_global_assignment -name PRESERVE_UNUSED_XCVR_CHANNEL          ON
 set_global_assignment -name RESERVE_ALL_UNUSED_PINS_WEAK_PULLUP   "As input tri-stated with weak pull-up"
 set_global_assignment -name POWER_APPLY_THERMAL_MARGIN            ADDITIONAL
-
-# 25G timing closure on the grade-3 AE3V part: force the dp_pkt RoCE multiply off
-# DSP blocks (DSP max ~378 MHz < the 402.83 MHz tx_clkout) to clear the min-period
-# wall, and let the fitter retime the unregistered-output setup paths.
-set_global_assignment -name DSP_BLOCK_BALANCING                   "LOGIC ELEMENTS"
-set_global_assignment -name ALLOW_REGISTER_RETIMING              ON
 
 
 set_global_assignment -name VERILOG_FILE ./../rtl/mitysom_ae3v_25g_8cam.v

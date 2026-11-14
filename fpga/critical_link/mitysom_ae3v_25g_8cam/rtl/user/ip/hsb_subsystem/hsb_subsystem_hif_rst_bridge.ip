@@ -225,7 +225,7 @@ Altera and sold by Altera or its authorized distributors.-->
         <ipxact:parameter parameterId="AUTO_CLK_CLOCK_RATE" type="longint">
           <ipxact:name>AUTO_CLK_CLOCK_RATE</ipxact:name>
           <ipxact:displayName>Auto CLOCK_RATE</ipxact:displayName>
-          <ipxact:value>402832031</ipxact:value>
+          <ipxact:value>266666667</ipxact:value>
         </ipxact:parameter>
       </ipxact:parameters>
     </altera:altera_module_parameters>
@@ -393,7 +393,7 @@ Altera and sold by Altera or its authorized distributors.-->
                 &lt;suppliedSystemInfos&gt;
                     &lt;entry&gt;
                         &lt;key&gt;CLOCK_RATE&lt;/key&gt;
-                        &lt;value&gt;402832031&lt;/value&gt;
+                        &lt;value&gt;266666667&lt;/value&gt;
                     &lt;/entry&gt;
                 &lt;/suppliedSystemInfos&gt;
                 &lt;consumedSystemInfos/&gt;

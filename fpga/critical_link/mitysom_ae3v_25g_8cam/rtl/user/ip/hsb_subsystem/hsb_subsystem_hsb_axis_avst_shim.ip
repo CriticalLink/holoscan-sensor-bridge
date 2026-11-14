@@ -213,7 +213,7 @@ Altera and sold by Altera or its authorized distributors.-->
         <ipxact:parameter parameterId="symbolsPerBeat" type="int">
           <ipxact:name>symbolsPerBeat</ipxact:name>
           <ipxact:displayName>Symbols per beat  </ipxact:displayName>
-          <ipxact:value>8</ipxact:value>
+          <ipxact:value>16</ipxact:value>
         </ipxact:parameter>
       </ipxact:parameters>
     </ipxact:busInterface>
@@ -347,7 +347,7 @@ Altera and sold by Altera or its authorized distributors.-->
           <ipxact:vectors>
             <ipxact:vector>
               <ipxact:left>0</ipxact:left>
-              <ipxact:right>63</ipxact:right>
+              <ipxact:right>127</ipxact:right>
             </ipxact:vector>
           </ipxact:vectors>
           <ipxact:wireTypeDefs>
@@ -404,7 +404,7 @@ Altera and sold by Altera or its authorized distributors.-->
           <ipxact:vectors>
             <ipxact:vector>
               <ipxact:left>0</ipxact:left>
-              <ipxact:right>2</ipxact:right>
+              <ipxact:right>3</ipxact:right>
             </ipxact:vector>
           </ipxact:vectors>
           <ipxact:wireTypeDefs>
@@ -487,7 +487,7 @@ Altera and sold by Altera or its authorized distributors.-->
           <ipxact:vectors>
             <ipxact:vector>
               <ipxact:left>0</ipxact:left>
-              <ipxact:right>63</ipxact:right>
+              <ipxact:right>127</ipxact:right>
             </ipxact:vector>
           </ipxact:vectors>
           <ipxact:wireTypeDefs>
@@ -505,7 +505,7 @@ Altera and sold by Altera or its authorized distributors.-->
           <ipxact:vectors>
             <ipxact:vector>
               <ipxact:left>0</ipxact:left>
-              <ipxact:right>7</ipxact:right>
+              <ipxact:right>15</ipxact:right>
             </ipxact:vector>
           </ipxact:vectors>
           <ipxact:wireTypeDefs>
@@ -535,7 +535,7 @@ Altera and sold by Altera or its authorized distributors.-->
         <ipxact:parameter parameterId="C_S_AXIS_TDATA_WIDTH" type="int">
           <ipxact:name>C_S_AXIS_TDATA_WIDTH</ipxact:name>
           <ipxact:displayName>Bus Data Width</ipxact:displayName>
-          <ipxact:value>64</ipxact:value>
+          <ipxact:value>128</ipxact:value>
         </ipxact:parameter>
         <ipxact:parameter parameterId="C_AXIS_TUSER_WIDTH" type="int">
           <ipxact:name>C_AXIS_TUSER_WIDTH</ipxact:name>
@@ -668,7 +668,7 @@ Altera and sold by Altera or its authorized distributors.-->
                     &lt;name&gt;av_src_data&lt;/name&gt;
                     &lt;role&gt;data&lt;/role&gt;
                     &lt;direction&gt;Output&lt;/direction&gt;
-                    &lt;width&gt;64&lt;/width&gt;
+                    &lt;width&gt;128&lt;/width&gt;
                     &lt;lowerBound&gt;0&lt;/lowerBound&gt;
                     &lt;vhdlType&gt;STD_LOGIC_VECTOR&lt;/vhdlType&gt;
                     &lt;terminationValue&gt;0&lt;/terminationValue&gt;
@@ -704,7 +704,7 @@ Altera and sold by Altera or its authorized distributors.-->
                     &lt;name&gt;av_src_empty&lt;/name&gt;
                     &lt;role&gt;empty&lt;/role&gt;
                     &lt;direction&gt;Output&lt;/direction&gt;
-                    &lt;width&gt;3&lt;/width&gt;
+                    &lt;width&gt;4&lt;/width&gt;
                     &lt;lowerBound&gt;0&lt;/lowerBound&gt;
                     &lt;vhdlType&gt;STD_LOGIC_VECTOR&lt;/vhdlType&gt;
                     &lt;terminationValue&gt;0&lt;/terminationValue&gt;
@@ -777,7 +777,7 @@ Altera and sold by Altera or its authorized distributors.-->
                     &lt;/entry&gt;
                     &lt;entry&gt;
                         &lt;key&gt;symbolsPerBeat&lt;/key&gt;
-                        &lt;value&gt;8&lt;/value&gt;
+                        &lt;value&gt;16&lt;/value&gt;
                     &lt;/entry&gt;
                 &lt;/parameterValueMap&gt;
             &lt;/parameters&gt;
@@ -827,7 +827,7 @@ Altera and sold by Altera or its authorized distributors.-->
                     &lt;name&gt;s_axis_tdata&lt;/name&gt;
                     &lt;role&gt;tdata&lt;/role&gt;
                     &lt;direction&gt;Input&lt;/direction&gt;
-                    &lt;width&gt;64&lt;/width&gt;
+                    &lt;width&gt;128&lt;/width&gt;
                     &lt;lowerBound&gt;0&lt;/lowerBound&gt;
                     &lt;vhdlType&gt;STD_LOGIC_VECTOR&lt;/vhdlType&gt;
                     &lt;terminationValue&gt;0&lt;/terminationValue&gt;
@@ -836,7 +836,7 @@ Altera and sold by Altera or its authorized distributors.-->
                     &lt;name&gt;s_axis_tkeep&lt;/name&gt;
                     &lt;role&gt;tkeep&lt;/role&gt;
                     &lt;direction&gt;Input&lt;/direction&gt;
-                    &lt;width&gt;8&lt;/width&gt;
+                    &lt;width&gt;16&lt;/width&gt;
                     &lt;lowerBound&gt;0&lt;/lowerBound&gt;
                     &lt;vhdlType&gt;STD_LOGIC_VECTOR&lt;/vhdlType&gt;
                     &lt;terminationValue&gt;0&lt;/terminationValue&gt;
