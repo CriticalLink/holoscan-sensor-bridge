@@ -10,8 +10,8 @@ every camera. This README replaces Altera's; everything else from Altera's relea
 
 Critical Link's additions:
 
-- [`fpga/critical_link`](fpga/critical_link/README.md): four FPGA designs, for the Group
-  A and Group B MitySOM-A5E, each with and without the HPS
+- [`fpga/critical_link`](fpga/critical_link/README.md): four FPGA designs, 25GbE and
+  10GbE, each with and without the HPS, built for the Group A or Group B MitySOM-A5E
 - [`examples/critical_link`](examples/critical_link): the camera support, the
   `mitysom_player.py` demo and a Jetson network setup script
 
@@ -37,17 +37,17 @@ shows the board and camera connections with photos.
 - A MitySOM-A5E on the MitySOM-A5E STD baseboard (80-001828RI-7), switch S7 on its +1.8V
   side:
 
-  | SOM                       | FPGA            | Designs                                                      |
-  | ------------------------- | --------------- | ------------------------------------------------------------ |
-  | Group A, A5ED-A63-144-SRC | A5ED065AB32AE3V | `mitysom_ae3v_25g_8cam`, `mitysom_ae3v_25g_hps_8cam` (25GbE) |
-  | Group B, A5ED-B64-144-SRI | A5ED065BB32AI4S | `mitysom_ai4s_10g_8cam`, `mitysom_ai4s_10g_hps_8cam` (10GbE) |
+  | SOM                       | FPGA            | Designs                                            |
+  | ------------------------- | --------------- | -------------------------------------------------- |
+  | Group A, A5ED-A63-144-SRC | A5ED065AB32AE3V | all four: 25GbE and 10GbE                          |
+  | Group B, A5ED-B64-144-SRI | A5ED065BB32AI4S | `mitysom_10g_8cam`, `mitysom_10g_hps_8cam` (10GbE) |
 
 - Up to eight IMX678 camera modules with 24 MHz INCK on the baseboard's MIPI connectors:
   camera 0-7 on J16, J15, J17, J18, J20, J24, J25 and J26 (CAM1-CAM8).
 
 - An NVIDIA Jetson AGX Thor developer kit with JetPack 7.2, its QSFP port cabled to the
   baseboard's SFP port through a passive breakout cable: QSFP28 (100G) to 4x SFP28 for
-  Group A at 25G, or QSFP+ to 4x SFP+ for Group B at 10G.
+  the 25G designs, or QSFP+ to 4x SFP+ for the 10G designs.
 
 - A JTAG cable for the SOM and the Quartus Prime Pro 26.1 programmer.
 
@@ -56,19 +56,23 @@ shows the board and camera connections with photos.
 Prebuilt images for each design are attached to this repository's
 [GitHub releases](https://github.com/criticallink/holoscan-sensor-bridge/releases):
 
-- FPGA-first designs: `<design>.sof` (load over JTAG) and `<design>.jic.zip` (QSPI
-  flash, unzip first)
-- HPS-first designs: `<design>.hps.jic.zip` (QSPI flash, unzip first),
-  `<design>.core.rbf` (the fabric, loaded from the SD card) and the matching SD card
-  image, plus `<design>.sof` for loading the fabric over JTAG
+- FPGA-first designs: `<design>_<model>.sof` (load over JTAG) and
+  `<design>_<model>.jic.zip` (QSPI flash, unzip first)
+- HPS-first designs: `<design>_<model>.hps.jic.zip` (QSPI flash, unzip first),
+  `<design>_<model>.core.rbf` (the fabric, loaded from the SD card) and the matching SD
+  card image `<design>_<model>_sd.img.zip` (unzip, then write it to a microSD card), plus
+  `<design>_<model>.sof` for loading the fabric over JTAG
+
+`<model>` is the SOM model from the table above.
 
 [`fpga/critical_link/README.md`](fpga/critical_link/README.md) has the programming
 steps and the details of each design. Use the FPGA image and the `examples/` host
 software from the same release: the host software turns the cameras on.
 
 To build a design yourself, with Quartus Prime Pro 26.1 and the free MIPI IP licenses,
-run `fpga/critical_link/build.tcl`, which writes the SOF and the flash images; see the
-[Build](fpga/critical_link/README.md#build) section.
+run `fpga/critical_link/build.tcl`, which writes the SOF and the flash images for the
+SOM model you choose with `-model`; see the [Build](fpga/critical_link/README.md#build)
+section.
 
 ## Set up the Jetson AGX Thor
 

@@ -6,22 +6,31 @@ derived from Altera's Agilex 5 MIPI demo (in this repository under `fpga/altera/
 ported to the MitySOM-A5E starting from that demo's 2.6.0-EA.2 release, and built around
 the NVIDIA Holoscan Sensor Bridge IP in `fpga/nv_hsb_ip`.
 
-| Design                      | SOM                       | FPGA            | Ethernet | Boot       |
-| --------------------------- | ------------------------- | --------------- | -------- | ---------- |
-| `mitysom_ae3v_25g_8cam`     | Group A, A5ED-A63-144-SRC | A5ED065AB32AE3V | 25GbE    | FPGA first |
-| `mitysom_ae3v_25g_hps_8cam` | Group A, A5ED-A63-144-SRC | A5ED065AB32AE3V | 25GbE    | HPS first  |
-| `mitysom_ai4s_10g_8cam`     | Group B, A5ED-B64-144-SRI | A5ED065BB32AI4S | 10GbE    | FPGA first |
-| `mitysom_ai4s_10g_hps_8cam` | Group B, A5ED-B64-144-SRI | A5ED065BB32AI4S | 10GbE    | HPS first  |
+| Design                 | Ethernet | Boot       | SOMs          | Default SOM      |
+| ---------------------- | -------- | ---------- | ------------- | ---------------- |
+| `mitysom_25g_8cam`     | 25GbE    | FPGA first | Group A       | A5ED-A63-144-SRC |
+| `mitysom_25g_hps_8cam` | 25GbE    | HPS first  | Group A       | A5ED-A63-144-SRC |
+| `mitysom_10g_8cam`     | 10GbE    | FPGA first | Group A and B | A5ED-B64-144-SRI |
+| `mitysom_10g_hps_8cam` | 10GbE    | HPS first  | Group A and B | A5ED-B64-144-SRI |
+
+| SOM model           | SOM  | Part              | Group | HPS memory           |
+| ------------------- | ---- | ----------------- | ----- | -------------------- |
+| A5ED-A63-144-SRC    | STD  | A5ED065AB32AE3V   | A     | 4 GB at 1333.333 MHz |
+| A5ED-B64-144-SRI    | STD  | A5ED065BB32AI4S   | B     | 4 GB at 1333.333 MHz |
+| A5ED-B64-144-SRC-X  | STD  | A5ED065BB32AE4SR0 | B     | 4 GB at 1333.333 MHz |
+| A5ED-B64-188-SRC-X  | STD  | A5ED065BB32AE4SR0 | B     | 8 GB at 1333.333 MHz |
+| A5ED-B46-144-SRI    | STD  | A5ED043BB32AI6S   | B     | 4 GB at 1066.667 MHz |
 
 - **FPGA first:** the SOM's QSPI holds the FPGA image and the HPS is unused. The
   baseboard fan is driven by an HPS GPIO, so it does not run with these designs.
 - **HPS first:** the HPS boots Linux from the SD card and loads the FPGA fabric from
   `/lib/firmware/a5e.core.rbf`. The HPS runs independently of the camera pipeline; its
   device tree turns the fan on.
-- The Group A part needs SmartVID: each AE3V design's
-  `quartus/shell/board_subsystem.qsf` configures the core regulator over the SDM PMBus.
-  A design moves between the two parts only through a copy that already targets the
-  destination part, never by changing the device string alone.
+- A design builds for any SOM model in the second table whose group the design's SOMs
+  column lists, chosen with `build.tcl -model` (see Build). The model sets the part and,
+  in the HPS-first designs, the HPS memory size and rate. A Group A part needs SmartVID:
+  `quartus/shell/board_subsystem.qsf` configures the core regulator over the SDM PMBus
+  for a Group A device and fixed voltage for Group B. 25GbE needs a Group A part.
 
 ## Cameras
 
@@ -69,21 +78,27 @@ Requirements:
   same SPL serves both SOMs.
 
 `build.tcl`, in this directory, builds any of the designs: it generates the Platform
-Designer systems, compiles the design and writes its flash images into the design's
-`quartus/output_files/`. `<design>` is a design name from the table above or the path of
-a design directory. From the repository root:
+Designer systems, compiles the design and writes its flash images, named with the SOM
+model. `<design>` is a design name from the table above or the path of a design
+directory. From the repository root:
 
 ```bash
-# FPGA-first: <design>.sof and <design>.jic
+# FPGA-first: <design>_<model>.sof and <design>_<model>.jic
 quartus_sh -t fpga/critical_link/build.tcl <design>
-# HPS-first: <design>.sof, <design>.hps.jic and <design>.core.rbf
+# HPS-first: <design>_<model>.sof, <design>_<model>.hps.jic and <design>_<model>.core.rbf
 quartus_sh -t fpga/critical_link/build.tcl <design> -spl u-boot-spl.ihex
+# For another SOM model than the default: add -model <model>
+quartus_sh -t fpga/critical_link/build.tcl mitysom_10g_8cam -model A5ED-A63-144-SRC
 ```
 
-`-images_only` writes the images from the SOF already in `quartus/output_files/` without
-compiling. The script stops at the first step that fails. Each build regenerates the IP,
-so the HSB IP datecode and the placement change from build to build; the script warns if
-the design's timing summary shows a miss or is absent. The build has been run on Linux.
+A model with the design's part, and in an HPS-first design the HPS memory the design
+carries, builds in the design directory, with the images in its `quartus/output_files/`.
+Another model builds in a copy of the design's sources at `fpga/build/<design>_<model>/`,
+with the images in that copy's `quartus/output_files/`; the design directory is not
+changed. `-images_only` writes the images from the SOF already there without compiling.
+The script stops at the first step that fails. Each build regenerates the IP, so the HSB
+IP datecode and the placement change from build to build; the script warns if the
+design's timing summary shows a miss or is absent. The build has been run on Linux.
 
 Both MIPI D-PHY IPs enable initial skew calibration on every link, which the IP
 recommends above 1500 Mbps; the IMX678 sends the calibration sequence at stream start.
@@ -107,16 +122,16 @@ unconfigured; check yours with `jtagconfig`.
 Load a SOF over JTAG (lost at power off):
 
 ```bash
-quartus_pgm -c 1 -m jtag -o "p;<design>.sof@2"
+quartus_pgm -c 1 -m jtag -o "p;<design>_<model>.sof@2"
 ```
 
 Or write the image to the SOM's QSPI flash. The release has the JIC, and `build.tcl`
-writes it for your own builds; by hand, create it from the SOF with the design's FPGA as
-the flash loader:
+writes it for your own builds; by hand, create it from the SOF with the SOM model's part
+as the flash loader:
 
 ```bash
-quartus_pfg -c -o device=MT25QU256 -o mode=ASX4 -o flash_loader=<fpga> <design>.sof <design>.jic
-quartus_pgm -c 1 -m jtag -o "piv;<design>.jic@2"
+quartus_pfg -c -o device=MT25QU256 -o mode=ASX4 -o flash_loader=<part> <design>_<model>.sof <design>_<model>.jic
+quartus_pgm -c 1 -m jtag -o "piv;<design>_<model>.jic@2"
 ```
 
 then power cycle the board.
@@ -131,14 +146,15 @@ your own builds; by hand:
 
 ```bash
 quartus_pfg -c -o hps_path=u-boot-spl.ihex -o hps=on -o device=MT25QU256 -o mode=ASX4 \
-  -o flash_loader=<fpga> <design>.sof <design>.jic
-# writes <design>.hps.jic and <design>.core.rbf
+  -o flash_loader=<part> <design>_<model>.sof <design>_<model>.jic
+# writes <design>_<model>.hps.jic and <design>_<model>.core.rbf
 ```
 
-1. Write the release's SD card image for the design, or put `<design>.core.rbf` on an
-   existing card as `/lib/firmware/a5e.core.rbf`.
+1. Write the release's SD card image for the design and SOM model, or put
+   `<design>_<model>.core.rbf` on an existing card for the SOM as
+   `/lib/firmware/a5e.core.rbf`.
 1. Halt Linux (`poweroff`) and program the JIC:
-   `quartus_pgm -c 1 -m jtag -o "piv;<design>.hps.jic@2"`
+   `quartus_pgm -c 1 -m jtag -o "piv;<design>_<model>.hps.jic@2"`
 1. Power cycle the board. U-Boot prints `FPGA reconfiguration OK!` when it loads the
    fabric.
 
