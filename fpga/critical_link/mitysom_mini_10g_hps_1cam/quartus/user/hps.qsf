@@ -1,0 +1,242 @@
+###################################################################################
+# HPS pin assignments for mitysom_mini_10g_hps_1cam
+#
+# Pin assignments from the MitySOM-A5E reference design for the Mini SOM on the
+# Mini baseboard. The HPS LPDDR4 (x32) lives on bank 3A alongside the camera
+# D-PHY link (LINK0/J7) on disjoint pins. Bank 3A is set to 1.1V for both the
+# LVSTL DDR and the D-PHY.
+###################################################################################
+
+# Shared DDR/D-PHY bank voltage
+set_global_assignment -name IOBANK_VCCIO 1.1V -section_id 3A_B
+set_global_assignment -name IOBANK_VCCIO 1.1V -section_id 3A_T
+
+set_location_assignment PIN_K31 -to HPS_CK_T -comment IOBANK_3A_B
+set_instance_assignment -name IO_STANDARD "DIFFERENTIAL 1.1-V LVSTL" -to HPS_CK_T
+set_location_assignment PIN_K28 -to HPS_CK_C -comment IOBANK_3A_B
+set_instance_assignment -name IO_STANDARD "DIFFERENTIAL 1.1-V LVSTL" -to HPS_CK_C
+set_location_assignment PIN_B34 -to HPS_CKE[0] -comment IOBANK_3A_B
+set_instance_assignment -name IO_STANDARD "1.1-V LVSTL" -to HPS_CKE[0]
+set_location_assignment PIN_A34 -to HPS_CKE[1] -comment IOBANK_3A_B
+set_instance_assignment -name IO_STANDARD "1.1-V LVSTL" -to HPS_CKE[1]
+set_location_assignment PIN_K36 -to HPS_MEM_RESET_N -comment IOBANK_3A_B
+set_instance_assignment -name IO_STANDARD "1.1-V LVSTL" -to HPS_MEM_RESET_N
+set_location_assignment PIN_B32 -to HPS_CS[0] -comment IOBANK_3A_B
+set_instance_assignment -name IO_STANDARD "1.1-V LVSTL" -to HPS_CS[0]
+set_location_assignment PIN_A29 -to HPS_CS[1] -comment IOBANK_3A_B
+set_instance_assignment -name IO_STANDARD "1.1-V LVSTL" -to HPS_CS[1]
+set_location_assignment PIN_B42 -to HPS_CA[0] -comment IOBANK_3A_B
+set_instance_assignment -name IO_STANDARD "1.1-V LVSTL" -to HPS_CA[0]
+set_location_assignment PIN_A40 -to HPS_CA[1] -comment IOBANK_3A_B
+set_instance_assignment -name IO_STANDARD "1.1-V LVSTL" -to HPS_CA[1]
+set_location_assignment PIN_B44 -to HPS_CA[2] -comment IOBANK_3A_B
+set_instance_assignment -name IO_STANDARD "1.1-V LVSTL" -to HPS_CA[2]
+set_location_assignment PIN_A42 -to HPS_CA[3] -comment IOBANK_3A_B
+set_instance_assignment -name IO_STANDARD "1.1-V LVSTL" -to HPS_CA[3]
+set_location_assignment PIN_A37 -to HPS_CA[4] -comment IOBANK_3A_B
+set_instance_assignment -name IO_STANDARD "1.1-V LVSTL" -to HPS_CA[4]
+set_location_assignment PIN_B37 -to HPS_CA[5] -comment IOBANK_3A_B
+set_instance_assignment -name IO_STANDARD "1.1-V LVSTL" -to HPS_CA[5]
+set_instance_assignment -name IO_STANDARD "1.1-V LVSTL" -to HPS_DQ[0]
+set_location_assignment PIN_V48 -to HPS_DQ[0] -comment IOBANK_3A_B
+set_instance_assignment -name IO_STANDARD "1.1-V LVSTL" -to HPS_DQ[1]
+set_location_assignment PIN_P48 -to HPS_DQ[1] -comment IOBANK_3A_B
+set_instance_assignment -name IO_STANDARD "1.1-V LVSTL" -to HPS_DQ[2]
+set_location_assignment PIN_V45 -to HPS_DQ[2] -comment IOBANK_3A_B
+set_instance_assignment -name IO_STANDARD "1.1-V LVSTL" -to HPS_DQ[3]
+set_location_assignment PIN_P41 -to HPS_DQ[3] -comment IOBANK_3A_B
+set_instance_assignment -name IO_STANDARD "1.1-V LVSTL" -to HPS_DQ[4]
+set_location_assignment PIN_V56 -to HPS_DQ[4] -comment IOBANK_3A_B
+set_instance_assignment -name IO_STANDARD "1.1-V LVSTL" -to HPS_DQ[5]
+set_location_assignment PIN_V58 -to HPS_DQ[5] -comment IOBANK_3A_B
+set_instance_assignment -name IO_STANDARD "1.1-V LVSTL" -to HPS_DQ[6]
+set_location_assignment PIN_V61 -to HPS_DQ[6] -comment IOBANK_3A_B
+set_instance_assignment -name IO_STANDARD "1.1-V LVSTL" -to HPS_DQ[7]
+set_location_assignment PIN_P61 -to HPS_DQ[7] -comment IOBANK_3A_B
+set_instance_assignment -name IO_STANDARD "1.1-V LVSTL" -to HPS_DQ[8]
+set_location_assignment PIN_H55 -to HPS_DQ[8] -comment IOBANK_3A_B
+set_instance_assignment -name IO_STANDARD "1.1-V LVSTL" -to HPS_DQ[9]
+set_location_assignment PIN_K55 -to HPS_DQ[9] -comment IOBANK_3A_B
+set_instance_assignment -name IO_STANDARD "1.1-V LVSTL" -to HPS_DQ[10]
+set_location_assignment PIN_F43 -to HPS_DQ[10] -comment IOBANK_3A_B
+set_instance_assignment -name IO_STANDARD "1.1-V LVSTL" -to HPS_DQ[11]
+set_location_assignment PIN_D43 -to HPS_DQ[11] -comment IOBANK_3A_B
+set_instance_assignment -name IO_STANDARD "1.1-V LVSTL" -to HPS_DQ[12]
+set_location_assignment PIN_K52 -to HPS_DQ[12] -comment IOBANK_3A_B
+set_instance_assignment -name IO_STANDARD "1.1-V LVSTL" -to HPS_DQ[13]
+set_location_assignment PIN_F46 -to HPS_DQ[13] -comment IOBANK_3A_B
+set_instance_assignment -name IO_STANDARD "1.1-V LVSTL" -to HPS_DQ[14]
+set_location_assignment PIN_H46 -to HPS_DQ[14] -comment IOBANK_3A_B
+set_instance_assignment -name IO_STANDARD "1.1-V LVSTL" -to HPS_DQ[15]
+set_location_assignment PIN_F55 -to HPS_DQ[15] -comment IOBANK_3A_B
+set_instance_assignment -name IO_STANDARD "1.1-V LVSTL" -to HPS_DQ[16]
+set_location_assignment PIN_A16 -to HPS_DQ[16] -comment IOBANK_3A_B
+set_instance_assignment -name IO_STANDARD "1.1-V LVSTL" -to HPS_DQ[17]
+set_location_assignment PIN_B18 -to HPS_DQ[17] -comment IOBANK_3A_B
+set_instance_assignment -name IO_STANDARD "1.1-V LVSTL" -to HPS_DQ[18]
+set_location_assignment PIN_A23 -to HPS_DQ[18] -comment IOBANK_3A_B
+set_instance_assignment -name IO_STANDARD "1.1-V LVSTL" -to HPS_DQ[19]
+set_location_assignment PIN_B23 -to HPS_DQ[19] -comment IOBANK_3A_B
+set_instance_assignment -name IO_STANDARD "1.1-V LVSTL" -to HPS_DQ[20]
+set_location_assignment PIN_B25 -to HPS_DQ[20] -comment IOBANK_3A_B
+set_instance_assignment -name IO_STANDARD "1.1-V LVSTL" -to HPS_DQ[21]
+set_location_assignment PIN_A25 -to HPS_DQ[21] -comment IOBANK_3A_B
+set_instance_assignment -name IO_STANDARD "1.1-V LVSTL" -to HPS_DQ[22]
+set_location_assignment PIN_B8 -to HPS_DQ[22] -comment IOBANK_3A_B
+set_instance_assignment -name IO_STANDARD "1.1-V LVSTL" -to HPS_DQ[23]
+set_location_assignment PIN_B4 -to HPS_DQ[23] -comment IOBANK_3A_B
+set_instance_assignment -name IO_STANDARD "1.1-V LVSTL" -to HPS_DQ[24]
+set_location_assignment PIN_N1 -to HPS_DQ[24] -comment IOBANK_3A_B
+set_instance_assignment -name IO_STANDARD "1.1-V LVSTL" -to HPS_DQ[25]
+set_location_assignment PIN_T2 -to HPS_DQ[25] -comment IOBANK_3A_B
+set_instance_assignment -name IO_STANDARD "1.1-V LVSTL" -to HPS_DQ[26]
+set_location_assignment PIN_W2 -to HPS_DQ[26] -comment IOBANK_3A_B
+set_instance_assignment -name IO_STANDARD "1.1-V LVSTL" -to HPS_DQ[27]
+set_location_assignment PIN_W1 -to HPS_DQ[27] -comment IOBANK_3A_B
+set_instance_assignment -name IO_STANDARD "1.1-V LVSTL" -to HPS_DQ[28]
+set_location_assignment PIN_C2 -to HPS_DQ[28] -comment IOBANK_3A_B
+set_instance_assignment -name IO_STANDARD "1.1-V LVSTL" -to HPS_DQ[29]
+set_location_assignment PIN_E2 -to HPS_DQ[29] -comment IOBANK_3A_B
+set_instance_assignment -name IO_STANDARD "1.1-V LVSTL" -to HPS_DQ[30]
+set_location_assignment PIN_G2 -to HPS_DQ[30] -comment IOBANK_3A_B
+set_instance_assignment -name IO_STANDARD "1.1-V LVSTL" -to HPS_DQ[31]
+set_location_assignment PIN_G1 -to HPS_DQ[31] -comment IOBANK_3A_B
+set_location_assignment PIN_P56 -to HPS_DQS_T[0] -comment IOBANK_3A_B
+set_instance_assignment -name IO_STANDARD "DIFFERENTIAL 1.1-V LVSTL" -to HPS_DQS_T[0]
+set_location_assignment PIN_F52 -to HPS_DQS_T[1] -comment IOBANK_3A_B
+set_instance_assignment -name IO_STANDARD "DIFFERENTIAL 1.1-V LVSTL" -to HPS_DQS_T[1]
+set_location_assignment PIN_B20 -to HPS_DQS_T[2] -comment IOBANK_3A_T
+set_instance_assignment -name IO_STANDARD "DIFFERENTIAL 1.1-V LVSTL" -to HPS_DQS_T[2]
+set_location_assignment PIN_J2 -to HPS_DQS_T[3] -comment IOBANK_3A_T
+set_instance_assignment -name IO_STANDARD "DIFFERENTIAL 1.1-V LVSTL" -to HPS_DQS_T[3]
+set_location_assignment PIN_P53 -to HPS_DQS_C[0] -comment IOBANK_3A_B
+set_instance_assignment -name IO_STANDARD "DIFFERENTIAL 1.1-V LVSTL" -to HPS_DQS_C[0]
+set_location_assignment PIN_D52 -to HPS_DQS_C[1] -comment IOBANK_3A_B
+set_instance_assignment -name IO_STANDARD "DIFFERENTIAL 1.1-V LVSTL" -to HPS_DQS_C[1]
+set_location_assignment PIN_A18 -to HPS_DQS_C[2] -comment IOBANK_3A_T
+set_instance_assignment -name IO_STANDARD "DIFFERENTIAL 1.1-V LVSTL" -to HPS_DQS_C[2]
+set_location_assignment PIN_J1 -to HPS_DQS_C[3] -comment IOBANK_3A_T
+set_instance_assignment -name IO_STANDARD "DIFFERENTIAL 1.1-V LVSTL" -to HPS_DQS_C[3]
+set_location_assignment PIN_V50 -to HPS_DMI[0] -comment IOBANK_3A_B
+set_instance_assignment -name IO_STANDARD "1.1-V LVSTL" -to HPS_DMI[0]
+set_location_assignment PIN_K46 -to HPS_DMI[1] -comment IOBANK_3A_B
+set_instance_assignment -name IO_STANDARD "1.1-V LVSTL" -to HPS_DMI[1]
+set_location_assignment PIN_A12 -to HPS_DMI[2] -comment IOBANK_3A_T
+set_instance_assignment -name IO_STANDARD "1.1-V LVSTL" -to HPS_DMI[2]
+set_location_assignment PIN_M1 -to HPS_DMI[3] -comment IOBANK_3A_T
+set_instance_assignment -name IO_STANDARD "1.1-V LVSTL" -to HPS_DMI[3]
+set_location_assignment PIN_K38 -to HPS_RZQ -comment IOBANK_3A_B
+set_instance_assignment -name IO_STANDARD "1.1 V" -to HPS_RZQ
+set_location_assignment PIN_A26 -to HPS_CLKIN_P -comment IOBANK_3A_B
+set_instance_assignment -name IO_STANDARD "1.1V TRUE DIFFERENTIAL SIGNALING" -to HPS_CLKIN_P
+set_location_assignment PIN_B29 -to "HPS_CLKIN_P(n)" -comment IOBANK_3A_B
+set_instance_assignment -name IO_STANDARD "1.1V TRUE DIFFERENTIAL SIGNALING" -to "HPS_CLKIN_P(n)"
+set_location_assignment PIN_B59 -to I2C1_SDA -comment IOBANK_HPS
+set_instance_assignment -name IO_STANDARD "1.8 V" -to I2C1_SDA
+set_location_assignment PIN_A59 -to I2C1_SCL -comment IOBANK_HPS
+set_instance_assignment -name IO_STANDARD "1.8 V" -to I2C1_SCL
+set_location_assignment PIN_F60 -to UART_RX -comment IOBANK_HPS
+set_instance_assignment -name IO_STANDARD "1.8 V" -to UART_RX
+set_location_assignment PIN_A54 -to UART_TX -comment IOBANK_HPS
+set_instance_assignment -name IO_STANDARD "1.8 V" -to UART_TX
+set_location_assignment PIN_G81 -to SDCARD_PRSNT -comment IOBANK_HPS
+set_instance_assignment -name IO_STANDARD "1.8 V" -to SDCARD_PRSNT
+set_location_assignment PIN_E81 -to SDMMC_CLK -comment IOBANK_HPS
+set_instance_assignment -name IO_STANDARD "1.8 V" -to SDMMC_CLK
+set_location_assignment PIN_K74 -to SDMMC_CMD -comment IOBANK_HPS
+set_instance_assignment -name IO_STANDARD "1.8 V" -to SDMMC_CMD
+set_location_assignment PIN_B80 -to SDMMC_D[0] -comment IOBANK_HPS
+set_instance_assignment -name IO_STANDARD "1.8 V" -to SDMMC_D[0]
+set_location_assignment PIN_C80 -to SDMMC_D[1] -comment IOBANK_HPS
+set_instance_assignment -name IO_STANDARD "1.8 V" -to SDMMC_D[1]
+set_location_assignment PIN_P64 -to SDMMC_D[2] -comment IOBANK_HPS
+set_instance_assignment -name IO_STANDARD "1.8 V" -to SDMMC_D[2]
+set_location_assignment PIN_G80 -to SDMMC_D[3] -comment IOBANK_HPS
+set_instance_assignment -name IO_STANDARD "1.8 V" -to SDMMC_D[3]
+set_location_assignment PIN_B47 -to FAN_EN -comment IOBANK_HPS
+set_instance_assignment -name IO_STANDARD "1.8 V" -to FAN_EN
+set_instance_assignment -name WEAK_PULL_UP_RESISTOR ON -to FAN_EN
+set_location_assignment PIN_D67 -to HPS_CLK_25MHz -comment IOBANK_HPS
+set_instance_assignment -name IO_STANDARD "1.8 V" -to HPS_CLK_25MHz
+set_location_assignment PIN_B49 -to ETH1_RESETn -comment IOBANK_HPS
+set_instance_assignment -name IO_STANDARD "1.8 V" -to ETH1_RESETn
+set_location_assignment PIN_A51 -to EMAC1_RX_CLK -comment IOBANK_HPS
+set_instance_assignment -name IO_STANDARD "1.8 V" -to EMAC1_RX_CLK
+set_location_assignment PIN_K67 -to EMAC1_RX_CTL -comment IOBANK_HPS
+set_instance_assignment -name IO_STANDARD "1.8 V" -to EMAC1_RX_CTL
+set_location_assignment PIN_B65 -to EMAC1_RXD[0] -comment IOBANK_HPS
+set_instance_assignment -name IO_STANDARD "1.8 V" -to EMAC1_RXD[0]
+set_location_assignment PIN_K62 -to EMAC1_RXD[1] -comment IOBANK_HPS
+set_instance_assignment -name IO_STANDARD "1.8 V" -to EMAC1_RXD[1]
+set_location_assignment PIN_B61 -to EMAC1_RXD[2] -comment IOBANK_HPS
+set_instance_assignment -name IO_STANDARD "1.8 V" -to EMAC1_RXD[2]
+set_location_assignment PIN_A61 -to EMAC1_RXD[3] -comment IOBANK_HPS
+set_instance_assignment -name IO_STANDARD "1.8 V" -to EMAC1_RXD[3]
+set_location_assignment PIN_B68 -to EMAC1_TX_CLK -comment IOBANK_HPS
+set_instance_assignment -name IO_STANDARD "1.8 V" -to EMAC1_TX_CLK
+set_location_assignment PIN_A63 -to EMAC1_TX_CTL -comment IOBANK_HPS
+set_instance_assignment -name IO_STANDARD "1.8 V" -to EMAC1_TX_CTL
+set_location_assignment PIN_B57 -to EMAC1_TXD[0] -comment IOBANK_HPS
+set_instance_assignment -name IO_STANDARD "1.8 V" -to EMAC1_TXD[0]
+set_location_assignment PIN_F70 -to EMAC1_TXD[1] -comment IOBANK_HPS
+set_instance_assignment -name IO_STANDARD "1.8 V" -to EMAC1_TXD[1]
+set_location_assignment PIN_A65 -to EMAC1_TXD[2] -comment IOBANK_HPS
+set_instance_assignment -name IO_STANDARD "1.8 V" -to EMAC1_TXD[2]
+set_location_assignment PIN_H62 -to EMAC1_TXD[3] -comment IOBANK_HPS
+set_instance_assignment -name IO_STANDARD "1.8 V" -to EMAC1_TXD[3]
+set_location_assignment PIN_F67 -to EMAC1_MDC -comment IOBANK_HPS
+set_instance_assignment -name IO_STANDARD "1.8 V" -to EMAC1_MDC
+set_location_assignment PIN_A49 -to EMAC1_MDIO -comment IOBANK_HPS
+set_instance_assignment -name IO_STANDARD "1.8 V" -to EMAC1_MDIO
+set_location_assignment PIN_D60 -to I3C0_SCL -comment IOBANK_HPS
+set_instance_assignment -name IO_STANDARD "1.8 V" -to I3C0_SCL
+set_location_assignment PIN_B54 -to I3C0_SDA -comment IOBANK_HPS
+set_instance_assignment -name IO_STANDARD "1.8 V" -to I3C0_SDA
+set_location_assignment PIN_F74 -to I3C1_SCL -comment IOBANK_HPS
+set_instance_assignment -name IO_STANDARD "1.8 V" -to I3C1_SCL
+set_location_assignment PIN_E80 -to I3C1_SDA -comment IOBANK_HPS
+set_instance_assignment -name IO_STANDARD "1.8 V" -to I3C1_SDA
+set_instance_assignment -name WEAK_PULL_UP_RESISTOR ON -to SDMMC_D[0]
+set_instance_assignment -name WEAK_PULL_UP_RESISTOR ON -to SDMMC_CMD
+set_instance_assignment -name WEAK_PULL_UP_RESISTOR ON -to SDMMC_CLK
+set_instance_assignment -name WEAK_PULL_UP_RESISTOR ON -to SDMMC_D[1]
+set_instance_assignment -name WEAK_PULL_UP_RESISTOR ON -to SDMMC_D[2]
+set_instance_assignment -name WEAK_PULL_UP_RESISTOR ON -to SDMMC_D[3]
+set_location_assignment PIN_D74 -to i_usb1_clk -comment IOBANK_HPS
+set_location_assignment PIN_B76 -to i_usb1_dir -comment IOBANK_HPS
+set_location_assignment PIN_H70 -to i_usb1_nxt -comment IOBANK_HPS
+set_location_assignment PIN_K70 -to io_usb1_data0 -comment IOBANK_HPS
+set_location_assignment PIN_A76 -to io_usb1_data1 -comment IOBANK_HPS
+set_location_assignment PIN_B73 -to io_usb1_data2 -comment IOBANK_HPS
+set_location_assignment PIN_K60 -to io_usb1_data3 -comment IOBANK_HPS
+set_location_assignment PIN_A73 -to io_usb1_data4 -comment IOBANK_HPS
+set_location_assignment PIN_F62 -to io_usb1_data5 -comment IOBANK_HPS
+set_location_assignment PIN_B71 -to io_usb1_data6 -comment IOBANK_HPS
+set_location_assignment PIN_A71 -to io_usb1_data7 -comment IOBANK_HPS
+set_location_assignment PIN_B78 -to o_usb1_stp -comment IOBANK_HPS
+set_location_assignment PIN_V64 -to o_usb1_ulpi_reset_n -comment IOBANK_HPS
+set_instance_assignment -name IO_STANDARD "1.8 V" -to i_usb1_clk
+set_instance_assignment -name IO_STANDARD "1.8 V" -to i_usb1_dir
+set_instance_assignment -name IO_STANDARD "1.8 V" -to i_usb1_nxt
+set_instance_assignment -name IO_STANDARD "1.8 V" -to io_usb1_data0
+set_instance_assignment -name IO_STANDARD "1.8 V" -to io_usb1_data1
+set_instance_assignment -name IO_STANDARD "1.8 V" -to io_usb1_data2
+set_instance_assignment -name IO_STANDARD "1.8 V" -to io_usb1_data3
+set_instance_assignment -name IO_STANDARD "1.8 V" -to io_usb1_data4
+set_instance_assignment -name IO_STANDARD "1.8 V" -to io_usb1_data5
+set_instance_assignment -name IO_STANDARD "1.8 V" -to io_usb1_data6
+set_instance_assignment -name IO_STANDARD "1.8 V" -to io_usb1_data7
+set_instance_assignment -name IO_STANDARD "1.8 V" -to o_usb1_stp
+set_instance_assignment -name IO_STANDARD "1.8 V" -to o_usb1_ulpi_reset_n
+set_location_assignment PIN_AR69 -to i_usb31_phy_refclk_p_clk
+set_location_assignment PIN_AR66 -to "i_usb31_phy_refclk_p_clk(n)"
+set_location_assignment PIN_Y79 -to i_usb31_phy_rx_serial_n_i_rx_serial_n
+set_location_assignment PIN_Y81 -to i_usb31_phy_rx_serial_p_i_rx_serial_p
+set_location_assignment PIN_AC72 -to o_usb31_phy_tx_serial_n_o_tx_serial_n
+set_location_assignment PIN_AC75 -to o_usb31_phy_tx_serial_p_o_tx_serial_p
+set_instance_assignment -name IO_STANDARD HCSL -to i_usb31_phy_refclk_p_clk
+set_instance_assignment -name IO_STANDARD HCSL -to "i_usb31_phy_refclk_p_clk(n)"
+set_instance_assignment -name IO_STANDARD "HIGH SPEED DIFFERENTIAL I/O" -to i_usb31_phy_rx_serial_n_i_rx_serial_n
+set_instance_assignment -name IO_STANDARD "HIGH SPEED DIFFERENTIAL I/O" -to i_usb31_phy_rx_serial_p_i_rx_serial_p
+set_instance_assignment -name IO_STANDARD "HIGH SPEED DIFFERENTIAL I/O" -to o_usb31_phy_tx_serial_n_o_tx_serial_n
+set_instance_assignment -name IO_STANDARD "HIGH SPEED DIFFERENTIAL I/O" -to o_usb31_phy_tx_serial_p_o_tx_serial_p

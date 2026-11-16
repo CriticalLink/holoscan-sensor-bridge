@@ -1,0 +1,60 @@
+###################################################################################
+# Copyright (C) 2025 Altera Corporation
+#
+# This software and the related documents are Altera copyrighted materials, and
+# your use of them is governed by the express license under which they were
+# provided to you ("License"). Unless the License provides otherwise, you may
+# not use, modify, copy, publish, distribute, disclose or transmit this software
+# or the related documents without Altera's prior written permission.
+#
+# This software and the related documents are provided as is, with no express
+# or implied warranties, other than those that are expressly stated in the License.
+###################################################################################
+
+#-- MitySOM-A5E Mini baseboard MIPI pinout (HSIO Bank 3A)
+#--   LINK0 -> camera connector J7 (CAM1), the only camera connector on the Mini baseboard
+
+#-- MIPI reference clock (CSI_REFCLK, 20 MHz LVDS from U10 CLK3) on CLK_T_3A_1p
+set_location_assignment PIN_K21                                               -to mipi_ref_clk_0  -comment CLK_T_3A_1p
+set_instance_assignment -name IO_STANDARD "1.1V TRUE DIFFERENTIAL SIGNALING"  -to mipi_ref_clk_0  -entity mitysom_mini_10g_1cam
+
+#-- Bank 3A RZQ (RZQ_T_3A, GUI_RZQ_ID=1 in the D-PHY)
+set_location_assignment PIN_F24                   -to mipi_rzq
+set_instance_assignment -name IO_STANDARD "1.1 V" -to mipi_rzq  -entity mitysom_mini_10g_1cam
+
+#=== LINK0 (J7) =================================================================
+#-- clock lane
+set_location_assignment PIN_P33                 -to LINK0_dphy_io_dphy_link_c_p
+set_location_assignment PIN_V33                 -to LINK0_dphy_io_dphy_link_c_n
+set_instance_assignment -name IO_STANDARD DPHY  -to LINK0_dphy_io_dphy_link_c_p     -entity mitysom_mini_10g_1cam
+set_instance_assignment -name IO_STANDARD DPHY  -to LINK0_dphy_io_dphy_link_c_n     -entity mitysom_mini_10g_1cam
+
+#-- data lane 0
+set_location_assignment PIN_V41                 -to LINK0_dphy_io_dphy_link_d_p[0]
+set_location_assignment PIN_P39                 -to LINK0_dphy_io_dphy_link_d_n[0]
+set_instance_assignment -name IO_STANDARD DPHY  -to LINK0_dphy_io_dphy_link_d_p[0]  -entity mitysom_mini_10g_1cam
+set_instance_assignment -name IO_STANDARD DPHY  -to LINK0_dphy_io_dphy_link_d_n[0]  -entity mitysom_mini_10g_1cam
+
+#-- data lane 1
+set_location_assignment PIN_V35                 -to LINK0_dphy_io_dphy_link_d_p[1]
+set_location_assignment PIN_P35                 -to LINK0_dphy_io_dphy_link_d_n[1]
+set_instance_assignment -name IO_STANDARD DPHY  -to LINK0_dphy_io_dphy_link_d_p[1]  -entity mitysom_mini_10g_1cam
+set_instance_assignment -name IO_STANDARD DPHY  -to LINK0_dphy_io_dphy_link_d_n[1]  -entity mitysom_mini_10g_1cam
+
+#-- data lane 2
+set_location_assignment PIN_V30                 -to LINK0_dphy_io_dphy_link_d_p[2]
+set_location_assignment PIN_V27                 -to LINK0_dphy_io_dphy_link_d_n[2]
+set_instance_assignment -name IO_STANDARD DPHY  -to LINK0_dphy_io_dphy_link_d_p[2]  -entity mitysom_mini_10g_1cam
+set_instance_assignment -name IO_STANDARD DPHY  -to LINK0_dphy_io_dphy_link_d_n[2]  -entity mitysom_mini_10g_1cam
+
+#-- data lane 3
+set_location_assignment PIN_P27                 -to LINK0_dphy_io_dphy_link_d_p[3]
+set_location_assignment PIN_P25                 -to LINK0_dphy_io_dphy_link_d_n[3]
+set_instance_assignment -name IO_STANDARD DPHY  -to LINK0_dphy_io_dphy_link_d_p[3]  -entity mitysom_mini_10g_1cam
+set_instance_assignment -name IO_STANDARD DPHY  -to LINK0_dphy_io_dphy_link_d_n[3]  -entity mitysom_mini_10g_1cam
+
+#=== Camera IOs (HVIO Bank 5A, 3.3V), driven by HSB GPIO 0/1 ====================
+set_location_assignment PIN_BJ69                -to cam1_io1
+set_location_assignment PIN_BE69                -to cam1_io2
+set_instance_assignment -name IO_STANDARD "3.3-V LVCMOS"  -to cam1_io1  -entity mitysom_mini_10g_1cam
+set_instance_assignment -name IO_STANDARD "3.3-V LVCMOS"  -to cam1_io2  -entity mitysom_mini_10g_1cam

@@ -15,8 +15,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# Streams up to eight IMX678 cameras from a MitySOM-A5E STD baseboard into one tiled
-# Holoviz window. With 8 cameras the grid is 3x3 and the centre cell shows the
+# Streams up to eight IMX678 cameras from a MitySOM-A5E STD baseboard, or the one camera
+# of a MitySOM-A5E Mini baseboard, into one tiled Holoviz window; the FPGA image's HSB
+# UUID tells the two apart. With 8 cameras the grid is 3x3 and the centre cell shows the
 # Critical Link logo card.
 #
 # --tiles places each camera, the logo and blank cells in the grid explicitly.

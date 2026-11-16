@@ -3,15 +3,19 @@
 This repository is Critical Link's fork of
 [Altera's Holoscan Sensor Bridge repository](https://github.com/altera-fpga/holoscan-sensor-bridge),
 itself a fork of [NVIDIA's](https://github.com/nvidia-holoscan/holoscan-sensor-bridge).
-It adds a demo that streams up to eight IMX678 cameras from a MitySOM-A5E system on
-module to an NVIDIA Jetson AGX Thor over Ethernet, with optional YOLO11 body pose on
-every camera. This README replaces Altera's; everything else from Altera's release
-(2.6.0, built on NVIDIA Holoscan Sensor Bridge 2.6.0) is unchanged.
+It adds a demo that streams IMX678 cameras from a MitySOM-A5E system on module to an
+NVIDIA Jetson AGX Thor over Ethernet, with optional YOLO11 body pose on every camera: up
+to eight cameras on the MitySOM-A5E STD baseboard, one on the Mini baseboard. This README
+replaces Altera's; the rest of Altera's release (2.6.0, built on NVIDIA Holoscan Sensor
+Bridge 2.6.0) is unchanged apart from two fixes: `FusaCoeCaptureOp` starts its channels
+one at a time and reports capture errors, and the lazy imports in `hololink.operators`,
+`hololink.sensors` and `tools` are thread safe.
 
 Critical Link's additions:
 
-- [`fpga/critical_link`](fpga/critical_link/README.md): four FPGA designs, 25GbE and
-  10GbE, each with and without the HPS, built for the Group A or Group B MitySOM-A5E
+- [`fpga/critical_link`](fpga/critical_link/README.md): six FPGA designs, 25GbE and
+  10GbE for the STD baseboard and 10GbE for the Mini baseboard, each with and without
+  the HPS, built for the Group A or Group B MitySOM-A5E
 - [`examples/critical_link`](examples/critical_link): the camera support, the
   `mitysom_player.py` demo and a Jetson network setup script
 
@@ -35,15 +39,20 @@ page of the
 shows the board and camera connections with photos.
 
 - A MitySOM-A5E on the MitySOM-A5E STD baseboard (80-001828RI-7), switch S7 on its +1.8V
-  side:
+  side, or a MitySOM-A5E Mini on the Mini baseboard (80-001748RI-2):
 
-  | SOM                       | FPGA            | Designs                                            |
-  | ------------------------- | --------------- | -------------------------------------------------- |
-  | Group A, A5ED-A63-144-SRC | A5ED065AB32AE3V | all four: 25GbE and 10GbE                          |
-  | Group B, A5ED-B64-144-SRI | A5ED065BB32AI4S | `mitysom_10g_8cam`, `mitysom_10g_hps_8cam` (10GbE) |
+  | SOM                               | FPGA              | Designs                                                      |
+  | --------------------------------- | ----------------- | ------------------------------------------------------------ |
+  | STD Group A, A5ED-A63-144-SRC     | A5ED065AB32AE3V   | `mitysom_25g_8cam`, `mitysom_25g_hps_8cam` (25GbE)           |
+  | STD Group B, A5ED-B64-144-SRI     | A5ED065BB32AI4S   | `mitysom_10g_8cam`, `mitysom_10g_hps_8cam` (10GbE)           |
+  | Mini Group B, A5ED-B16-1X4-MRI-CS | A5ED013BB23AI6SCS | `mitysom_mini_10g_1cam`, `mitysom_mini_10g_hps_1cam` (10GbE) |
 
-- Up to eight IMX678 camera modules with 24 MHz INCK on the baseboard's MIPI connectors:
-  camera 0-7 on J16, J15, J17, J18, J20, J24, J25 and J26 (CAM1-CAM8).
+  These are the SOMs the release images are built for; other SOM models need a build of
+  their own (see below).
+
+- IMX678 camera modules with 24 MHz INCK on the baseboard's MIPI connectors: on the STD,
+  up to eight, camera 0-7 on J16, J15, J17, J18, J20, J24, J25 and J26 (CAM1-CAM8); on the
+  Mini, one, on J7.
 
 - An NVIDIA Jetson AGX Thor developer kit with JetPack 7.2, its QSFP port cabled to the
   baseboard's SFP port through a passive breakout cable: QSFP28 (100G) to 4x SFP28 for
@@ -112,9 +121,10 @@ xhost +local:docker
 sh docker/demo.sh python3 examples/critical_link/mitysom_player.py
 ```
 
-The player reads the FPGA image's HSB board UUID and stops if the image is not one of
-these designs. By default all eight cameras stream at 1080p30 into one window, with the
-Critical Link logo in the centre of the 3x3 grid. Useful options:
+The player reads the FPGA image's HSB board UUID to tell the STD baseboard from the
+Mini, and stops if the image is not one of these designs. By default every camera of the
+board streams at 1080p30 into one window; on the STD, all eight with the Critical Link
+logo in the centre of the 3x3 grid. Useful options:
 
 | Option                         | Effect                                                                      |
 | ------------------------------ | --------------------------------------------------------------------------- |
