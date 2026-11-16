@@ -51,7 +51,7 @@ import holoscan
 import numpy as np
 import PIL.Image
 from holoscan.core import ConditionType, IOSpec
-from mitysom_imx678 import CAMERA_CONNECTORS, MitySomImx678, power_off_cameras
+from mitysom_imx678 import PLATFORMS, MitySomImx678, power_off_cameras
 
 import hololink as hololink_module
 
@@ -69,9 +69,6 @@ COE_MAX_CAMERAS = 5
 COE_SAFE_CAMERAS = 3
 # A CoE camera that delivers no frame for this long stops the player
 COE_TIMEOUT_MS = 1500
-
-# HSB IP board UUIDs of the Altera Agilex 5 designs, which these designs keep
-UUIDS = ("b26763ac-af25-44f6-850e-dce30f33f4e3", "7b1fa8c7-31aa-44b6-abcc-eac134461fdc")
 
 RESOLUTIONS = {"720p": 720, "1080p": 1080, "4k": 2160}
 
@@ -106,9 +103,9 @@ shift_to_uint8 = cp.ElementwiseKernel(
 
 
 class CameraStream:
-    def __init__(self, cam_idx, hololink_channel, camera):
+    def __init__(self, cam_idx, connector, hololink_channel, camera):
         self.cam_idx = cam_idx
-        self.name = f"cam{cam_idx}-{CAMERA_CONNECTORS[cam_idx]}"
+        self.name = f"cam{cam_idx}-{connector}"
         self.hololink_channel = hololink_channel
         self.camera = camera
 
@@ -168,7 +165,7 @@ def parse_camera_list(text):
     if len(cameras) != len(set(cameras)):
         raise argparse.ArgumentTypeError(f"duplicate camera in list: {text!r}")
     for camera in cameras:
-        if not 0 <= camera < len(CAMERA_CONNECTORS):
+        if camera < 0:
             raise argparse.ArgumentTypeError(f"unknown camera index: {camera}")
     return cameras
 
@@ -184,7 +181,7 @@ def parse_tiles(text):
             camera = int(item)
         except ValueError:
             raise argparse.ArgumentTypeError(f"invalid tile: {item!r}")
-        if not 0 <= camera < len(CAMERA_CONNECTORS):
+        if camera < 0:
             raise argparse.ArgumentTypeError(f"unknown camera index: {camera}")
         tiles.append(camera)
     cameras = [t for t in tiles if isinstance(t, int)]
@@ -812,9 +809,12 @@ def main():
         "--cams",
         type=parse_camera_list,
         default=None,
-        help="comma-separated list of cameras to stream:"
-        + ", ".join(f" {i}={c}" for i, c in enumerate(CAMERA_CONNECTORS))
-        + " (default all eight, or the cameras in --tiles)",
+        help="comma-separated list of cameras to stream; "
+        + "; ".join(
+            f"{p.name}:" + ",".join(f" {i}={c}" for i, c in enumerate(p.connectors))
+            for p in PLATFORMS.values()
+        )
+        + " (default all the board's cameras, or the cameras in --tiles)",
     )
     parser.add_argument(
         "--tiles",
@@ -945,6 +945,7 @@ def main():
 
     if args.grid_columns is not None and args.grid_columns < 1:
         parser.error("--grid-columns must be at least 1")
+
     if args.tiles:
         if args.logo and not args.no_logo and "logo" not in args.tiles:
             parser.error("--logo needs a logo cell in --tiles")
@@ -958,8 +959,6 @@ def main():
                 f"--tiles has {len(args.tiles)} cells, not whole rows of {columns}"
             )
         args.grid_columns = columns
-    elif args.cams is None:
-        args.cams = list(range(len(CAMERA_CONNECTORS)))
     coe_list = None
     if args.force_coe and args.coe is None:
         parser.error("--force-coe needs --coe")
@@ -984,18 +983,51 @@ def main():
                 f"--coe with more than {COE_SAFE_CAMERAS} cameras can stall every"
                 " stream on the Thor's port; add --force-coe to run it anyway"
             )
-        if not set(coe_list) <= set(args.cams):
-            parser.error("--coe names a camera that is not streamed")
-
     if args.model == "pose":
         if args.engine is None:
             parser.error("--model pose needs --engine")
         if not os.path.exists(args.engine):
             parser.error(f"TensorRT engine not found: {args.engine}")
-        if len(args.cams) > args.batch_size:
+
+    # The designs carry one sensor interface per camera on a single data plane
+    for uuid, platform in PLATFORMS.items():
+        hololink_module.Enumerator.set_uuid_strategy(
+            uuid,
+            hololink_module.BasicEnumerationStrategy(
+                total_sensors=len(platform.connectors),
+                total_dataplanes=1,
+                sifs_per_sensor=1,
+            ),
+        )
+
+    channel_metadata = hololink_module.Enumerator.find_channel(channel_ip=FPGA_IP)
+    fpga_uuid = channel_metadata.get("fpga_uuid")
+    if fpga_uuid not in PLATFORMS:
+        parser.error(
+            f"the FPGA at {FPGA_IP} has HSB UUID {fpga_uuid}, not a MitySOM-A5E"
+            " image: use the FPGA image from the same release as this player"
+        )
+    platform = PLATFORMS[fpga_uuid]
+    connectors = platform.connectors
+    logging.info(f"{platform.name}, camera connectors {' '.join(connectors)}")
+    # The designs have no HSB VSYNC generator and do not use PTP
+    channel_metadata.update(
+        hololink_module.Metadata({"vsync_enable": 0, "ptp_enable": 0})
+    )
+
+    if args.cams is None:
+        args.cams = list(range(len(connectors)))
+    for camera in args.cams:
+        if camera >= len(connectors):
+            last = len(connectors) - 1
             parser.error(
-                f"{len(args.cams)} cameras exceed --batch-size {args.batch_size}"
+                f"unknown camera index {camera}: the {platform.name} has camera"
+                + (f"s 0-{last}" if last else " 0")
             )
+    if coe_list and not set(coe_list) <= set(args.cams):
+        parser.error("--coe names a camera that is not streamed")
+    if args.model == "pose" and len(args.cams) > args.batch_size:
+        parser.error(f"{len(args.cams)} cameras exceed --batch-size {args.batch_size}")
 
     tile_count = len(args.tiles) if args.tiles else len(args.cams)
     grid_columns, grid_rows = grid_shape(tile_count, args.grid_columns)
@@ -1031,26 +1063,15 @@ def main():
     cu_result, cu_context = cuda.cuDevicePrimaryCtxRetain(cu_device)
     assert cu_result == cuda.CUresult.CUDA_SUCCESS
 
-    # The designs carry one sensor interface per camera on a single data plane
-    uuid_strategy = hololink_module.BasicEnumerationStrategy(
-        total_sensors=len(CAMERA_CONNECTORS), total_dataplanes=1, sifs_per_sensor=1
-    )
-    for uuid in UUIDS:
-        hololink_module.Enumerator.set_uuid_strategy(uuid, uuid_strategy)
-
-    channel_metadata = hololink_module.Enumerator.find_channel(channel_ip=FPGA_IP)
-    # The designs have no HSB VSYNC generator and do not use PTP
-    channel_metadata.update(
-        hololink_module.Metadata({"vsync_enable": 0, "ptp_enable": 0})
-    )
-
     camera_streams = {}
     for cam_index in args.cams:
         camera_channel = hololink_module.Metadata(channel_metadata)
         hololink_module.DataChannel.use_sensor(camera_channel, cam_index)
         hololink_channel = hololink_module.DataChannel(camera_channel)
-        camera = MitySomImx678(hololink_channel, camera_id=cam_index)
-        camera_streams[cam_index] = CameraStream(cam_index, hololink_channel, camera)
+        camera = MitySomImx678(hololink_channel, platform, camera_id=cam_index)
+        camera_streams[cam_index] = CameraStream(
+            cam_index, connectors[cam_index], hololink_channel, camera
+        )
 
     first_stream = next(iter(camera_streams.values()))
     mode = first_stream.camera.get_mode(
@@ -1066,7 +1087,7 @@ def main():
     try:
         hololink.reset()
         # Reset clears the HSB GPIO, not the PCAL6408A: start every camera from off
-        power_off_cameras(hololink)
+        power_off_cameras(hololink, platform)
         missing_cams = set()
         for cam_index, camera_stream in camera_streams.items():
             try:
@@ -1080,7 +1101,7 @@ def main():
                     raise
                 missing_cams.add(cam_index)
                 logging.error(
-                    f"camera {cam_index} ({CAMERA_CONNECTORS[cam_index]}) did not"
+                    f"camera {cam_index} ({connectors[cam_index]}) did not"
                     f" answer at start-up, continuing without it: {e}"
                 )
         # CoE goes to the listed cameras, or to the first three (five with --force-coe)
@@ -1117,7 +1138,7 @@ def main():
         run_until_signal(application)
     finally:
         try:
-            power_off_cameras(hololink)
+            power_off_cameras(hololink, platform)
         except RuntimeError as e:
             logging.warning(f"Could not power the cameras off: {e}")
         hololink.stop()

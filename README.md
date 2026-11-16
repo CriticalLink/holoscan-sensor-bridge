@@ -112,8 +112,9 @@ xhost +local:docker
 sh docker/demo.sh python3 examples/critical_link/mitysom_player.py
 ```
 
-By default all eight cameras stream at 1080p30 into one window, with the Critical Link
-logo in the centre of the 3x3 grid. Useful options:
+The player reads the FPGA image's HSB board UUID and stops if the image is not one of
+these designs. By default all eight cameras stream at 1080p30 into one window, with the
+Critical Link logo in the centre of the 3x3 grid. Useful options:
 
 | Option                         | Effect                                                                      |
 | ------------------------------ | --------------------------------------------------------------------------- |

@@ -4163,7 +4163,7 @@ Altera and sold by Altera or its authorized distributors.-->
         <ipxact:parameter parameterId="UUID" type="string">
           <ipxact:name>UUID</ipxact:name>
           <ipxact:displayName>UUID</ipxact:displayName>
-          <ipxact:value>163659427910747593204075297523638869980</ipxact:value>
+          <ipxact:value>253355929612018555468847414416045137364</ipxact:value>
         </ipxact:parameter>
         <ipxact:parameter parameterId="BOARD_ID" type="string">
           <ipxact:name>BOARD_ID</ipxact:name>
