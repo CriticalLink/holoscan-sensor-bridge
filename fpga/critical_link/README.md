@@ -84,9 +84,9 @@ Its link is four MIPI D-PHY lanes at 1782 Mbps, as on the STD.
 Requirements:
 
 - Quartus Prime Pro 26.1 with Agilex 5 device support
-- The free Altera licenses for the MIPI D-PHY IP and the MIPI CSI-2 IP, installed before
-  synthesis. Without them the assembler writes only a time-limited SOF and the build
-  stops with an error.
+- The free Altera licenses for the MIPI D-PHY IP and the MIPI CSI-2 IP, from Altera's
+  Self-Service Licensing Center, installed before synthesis. Without them the assembler
+  writes only a time-limited SOF and the build stops with an error.
 - For the HPS-first designs, the SOM's HPS U-Boot SPL, attached to each
   [GitHub release](https://github.com/criticallink/holoscan-sensor-bridge/releases):
   `mitysom_u-boot-spl.ihex` for the STD SOMs, `mitysom_mini_u-boot-spl.ihex` for the
@@ -142,9 +142,12 @@ Quartus Prime Pro upgrades their IP.
 
 The release files for each tag are attached to the repository's
 [GitHub releases](https://github.com/criticallink/holoscan-sensor-bridge/releases). The
-commands below run with the Quartus programming tools and a JTAG cable connected to the
-baseboard. `@2` is the Agilex 5 device's position in the JTAG chain when it is
-unconfigured; check yours with `jtagconfig`.
+commands below run with the Quartus Prime Pro Programmer (in Quartus Prime Pro, or
+Altera's free standalone Programmer) on an x86-64 Linux or Windows PC, with a JTAG cable
+on the baseboard's JTAG header J3. `-c 1` is the first cable `jtagconfig` lists. The
+number after `@` is the Agilex 5 device's position in the JTAG chain: `jtagconfig` lists
+the chain's devices in order, so count to the `A5E...` line. It is usually `@2` when the
+FPGA is unconfigured and `@1` once it is configured.
 
 ### FPGA-first designs
 
@@ -154,16 +157,19 @@ Load a SOF over JTAG (lost at power off):
 quartus_pgm -c 1 -m jtag -o "p;<design>_<model>.sof@2"
 ```
 
-Or write the image to the SOM's QSPI flash. The release has the JIC, and `build.tcl`
-writes it for your own builds; by hand, create it from the SOF with the SOM model's part
-as the flash loader:
+Or write the release's JIC to the SOM's QSPI flash, then power cycle the board:
 
 ```bash
-quartus_pfg -c -o device=MT25QU256 -o mode=ASX4 -o flash_loader=<part> <design>_<model>.sof <design>_<model>.jic
 quartus_pgm -c 1 -m jtag -o "piv;<design>_<model>.jic@2"
 ```
 
-then power cycle the board.
+The design is running when `thor_network_setup.sh` on the Thor finishes without
+`no link on mgbe0_0`. `build.tcl` writes the JIC for your own builds. To make one from a
+SOF by hand, with the SOM model's part as the flash loader:
+
+```bash
+quartus_pfg -c -o device=MT25QU256 -o mode=ASX4 -o flash_loader=<part> <design>_<model>.sof <design>_<model>.jic
+```
 
 ### HPS-first designs
 
@@ -179,13 +185,18 @@ quartus_pfg -c -o hps_path=<SOM's SPL .ihex> -o hps=on -o device=MT25QU256 -o mo
 # writes <design>_<model>.hps.jic and <design>_<model>.core.rbf
 ```
 
-1. Write the release's SD card image for the design and SOM model, or put
-   `<design>_<model>.core.rbf` on an existing card for the SOM as
-   `/lib/firmware/a5e.core.rbf`.
-1. Halt Linux (`poweroff`) and program the JIC:
+1. Write the release's SD card image for the design and SOM model to a microSD card, or
+   put `<design>_<model>.core.rbf` on an existing card for the SOM as
+   `/lib/firmware/a5e.core.rbf`. On Linux, with the card at `/dev/sdX`:
+   `unzip -p <design>_<model>_sd.img.zip | sudo dd of=/dev/sdX bs=4M conv=fsync`; on
+   Windows, unzip it and write it with an image writer such as balenaEtcher. With the
+   board off, insert the card in the baseboard's microSD slot.
+1. If Linux is running, log in on the baseboard's console port (115200 baud) as `root`,
+   with no password, and run `poweroff`. Then program the JIC:
    `quartus_pgm -c 1 -m jtag -o "piv;<design>_<model>.hps.jic@2"`
-1. Power cycle the board. U-Boot prints `FPGA reconfiguration OK!` when it loads the
-   fabric.
+1. Power cycle the board. U-Boot prints `FPGA reconfiguration OK!` on the console port
+   when it loads the fabric. Linux then turns the fan on, and `thor_network_setup.sh` on
+   the Thor finishes without `no link on mgbe0_0`.
 
 Update the RBF before the JIC: a JIC from a newer build next to an older RBF does not
 boot.
