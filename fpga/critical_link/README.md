@@ -126,6 +126,18 @@ the clock-lane settle time: 20 gives about 250 ns, inside the D-PHY specificatio
 300 ns TCLK-SETTLE window with margin from both ends (the IP's maximum, 25, gives about
 295 ns).
 
+### Working on the designs with QuartusIQ
+
+The designs are standard Quartus Prime Pro projects: Platform Designer systems, `.qsf`
+assignments and Verilog top levels, built by `build.tcl`. QuartusIQ, Altera's AI assistant
+in Quartus Prime Pro 26.3 and later, works with projects like these: inside Quartus Prime
+Pro, or from AI coding tools such as Claude Code or Cursor through Altera's Quartus MCP
+servers. It can explain how a design is put together, look up IP and device documentation,
+and help you change a design, for example to retarget pins, reconfigure an IP or add Signal
+Tap, then compile it and check timing. See Altera's QuartusIQ documentation for setup.
+These designs are built and tested with Quartus Prime Pro 26.1; opening them in a newer
+Quartus Prime Pro upgrades their IP.
+
 ## Program the SOM
 
 The release files for each tag are attached to the repository's

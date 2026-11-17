@@ -81,7 +81,7 @@ software from the same release: the host software turns the cameras on.
 To build a design yourself, with Quartus Prime Pro 26.1 and the free MIPI IP licenses,
 run `fpga/critical_link/build.tcl`, which writes the SOF and the flash images for the
 SOM model you choose with `-model`; see the [Build](fpga/critical_link/README.md#build)
-section.
+section, which also covers working on the designs with Altera's QuartusIQ AI assistant.
 
 ## Set up the Jetson AGX Thor
 
